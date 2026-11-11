@@ -1,0 +1,4 @@
+6.4 Gb/s file (as committed)   stack 23.8927 W, trace span 65.8 us
+5.2 Gb/s file                  stack 23.7955 W, trace span 81.0 us
+committed files                stack 23.8987 W, trace span 65.8 us
+5.2 Gb/s timing vs 6.4 Gb/s file: -0.41 %; vs committed: -0.43 %

@@ -1,0 +1,4 @@
+# Python 3.9+
+numpy>=1.17
+matplotlib>=3.3
+# AttAcc's main.py (make full) also needs pandas; dram/setup/attacc.sh installs numpy and pandas into its own venv

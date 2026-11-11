@@ -1,0 +1,504 @@
+diff --git a/ramulator2/src/dram_controller/controller.h b/ramulator2/src/dram_controller/controller.h
+index 3a8cd14..4d368a0 100644
+--- a/ramulator2/src/dram_controller/controller.h
++++ b/ramulator2/src/dram_controller/controller.h
+@@ -1,59 +1,60 @@
+-#ifndef RAMULATOR_CONTROLLER_CONTROLLER_H
+-#define RAMULATOR_CONTROLLER_CONTROLLER_H
+-
+-#include <vector>
+-#include <deque>
+-
+-#include <spdlog/spdlog.h>
+-#include <yaml-cpp/yaml.h>
+-
+-#include "base/base.h"
+-#include "dram/dram.h"
+-#include "dram_controller/scheduler.h"
+-#include "dram_controller/plugin.h"
+-#include "dram_controller/refresh.h"
+-
+-
+-namespace Ramulator {
+-
+-class IDRAMController : public Clocked<IDRAMController> {
+-  RAMULATOR_REGISTER_INTERFACE(IDRAMController, "Controller", "Memory Controller Interface");
+-
+-  public:
+-    IDRAM*  m_dram = nullptr;          
+-    IScheduler*   m_scheduler = nullptr;
+-    IRefreshManager*   m_refresh = nullptr;
+-
+-    int m_channel_id = -1;
+-  public:
+-    /**
+-     * @brief       Send a request to the memory controller.
+-     * 
+-     * @param    req        The request to be enqueued.
+-     * @return   true       Successful.
+-     * @return   false      Failed (e.g., buffer full).
+-     */
+-    virtual bool send(Request& req) = 0;
+-
+-    /**
+-     * @brief       Send a high-priority request to the memory controller.
+-     * 
+-     */
+-    virtual bool priority_send(Request& req) = 0;
+-
+-    /**
+-     * @brief       Ticks the memory controller.
+-     * 
+-     */
+-    virtual void tick() = 0;
+-   
++#ifndef RAMULATOR_CONTROLLER_CONTROLLER_H
++#define RAMULATOR_CONTROLLER_CONTROLLER_H
++
++#include <vector>
++#include <deque>
++
++#include <spdlog/spdlog.h>
++#include <yaml-cpp/yaml.h>
++
++#include "base/base.h"
++#include "dram/dram.h"
++#include "dram_controller/scheduler.h"
++#include "dram_controller/plugin.h"
++#include "dram_controller/refresh.h"
++
++
++namespace Ramulator {
++
++class IDRAMController : public Clocked<IDRAMController> {
++  RAMULATOR_REGISTER_INTERFACE(IDRAMController, "Controller", "Memory Controller Interface");
++
++  public:
++    IDRAM*  m_dram = nullptr;          
++    IDRAM*  m_dram_pim = nullptr;      // row state used by PIM commands (= m_dram unless dual_row_buffer)
++    IScheduler*   m_scheduler = nullptr;
++    IRefreshManager*   m_refresh = nullptr;
++
++    int m_channel_id = -1;
++  public:
++    /**
++     * @brief       Send a request to the memory controller.
++     * 
++     * @param    req        The request to be enqueued.
++     * @return   true       Successful.
++     * @return   false      Failed (e.g., buffer full).
++     */
++    virtual bool send(Request& req) = 0;
++
++    /**
++     * @brief       Send a high-priority request to the memory controller.
++     * 
++     */
++    virtual bool priority_send(Request& req) = 0;
++
++    /**
++     * @brief       Ticks the memory controller.
++     * 
++     */
++    virtual void tick() = 0;
++   
+     virtual bool is_pending() = 0;
+ 
+     // For debugging
+     Clk_t get_clk() {return m_clk;}
+ 
+-};
+-
+-}       // namespace Ramulator
+-
++};
++
++}       // namespace Ramulator
++
+ #endif  // RAMULATOR_CONTROLLER_CONTROLLER_H
+\ No newline at end of file
+diff --git a/ramulator2/src/dram_controller/impl/hbm3_pim_controller.cpp b/ramulator2/src/dram_controller/impl/hbm3_pim_controller.cpp
+index 1bf27fc..252a32e 100644
+--- a/ramulator2/src/dram_controller/impl/hbm3_pim_controller.cpp
++++ b/ramulator2/src/dram_controller/impl/hbm3_pim_controller.cpp
+@@ -27,6 +27,9 @@ class HBM3PIMController final : public IDRAMController, public Implementation {
+     size_t s_num_row_conflicts = 0;
+ 
+     bool is_pim = false;
++    bool m_pim_first = true;              // pim_priority (false: reads/writes before PIM requests)
++    bool m_dual = false;                  // dual_row_buffer (PIM requests use m_dram_pim)
++    IScheduler* m_scheduler_pim = nullptr;
+ 
+   public:
+     void init() override {
+@@ -34,6 +37,8 @@ class HBM3PIMController final : public IDRAMController, public Implementation {
+       m_wr_high_watermark = param<float>("wr_high_watermark").desc("Threshold for switching to write mode.").default_val(0.8f);
+ 
+       m_scheduler = create_child_ifce<IScheduler>();
++      m_pim_first = param<bool>("pim_priority").desc("Serve PIM requests before reads/writes.").default_val(true);
++      m_scheduler_pim = m_scheduler;
+       m_refresh = create_child_ifce<IRefreshManager>();    
+ 
+       if (m_config["plugins"]) {
+@@ -46,6 +51,18 @@ class HBM3PIMController final : public IDRAMController, public Implementation {
+ 
+     void setup(IFrontEnd* frontend, IMemorySystem* memory_system) override {
+       m_dram = memory_system->get_ifce<IDRAM>();
++      m_dram_pim = m_dram;
++      try {
++        m_dram_pim = memory_system->get_ifce<IDRAM>("DRAM_PIM");
++        m_dual = true;
++      } catch (const ConfigurationError&) {}
++      if (m_dual) {
++        YAML::Node n;
++        n["Scheduler"]["impl"] = "PIM";
++        n["Scheduler"]["use_pim_dram"] = true;
++        m_scheduler_pim = create_child_ifce<IScheduler>(n);
++        m_scheduler_pim->m_impl->setup(nullptr, memory_system);
++      }
+       m_row_addr_idx = m_dram->m_levels("row");
+       m_priority_buffer.max_size = 512*3 + 32;
+     };
+@@ -126,7 +143,7 @@ class HBM3PIMController final : public IDRAMController, public Implementation {
+       // 4. Finally, issue the commands to serve the request
+       if (request_found) {
+         // If we find a real request to serve
+-        m_dram->issue_command(req_it->command, req_it->addr_vec);
++        (buffer == &m_pim_buffer ? m_dram_pim : m_dram)->issue_command(req_it->command, req_it->addr_vec);
+ 
+         // If we are issuing the last command, set depart clock cycle and move the request to the pending queue
+         if (req_it->command == req_it->final_command) {
+@@ -158,7 +175,7 @@ class HBM3PIMController final : public IDRAMController, public Implementation {
+         plugin->update(sec_request_found, sec_req_it);
+       }
+       if (sec_request_found) {
+-        m_dram->issue_command(sec_req_it->command, sec_req_it->addr_vec);
++        (buffer == &m_pim_buffer ? m_dram_pim : m_dram)->issue_command(sec_req_it->command, sec_req_it->addr_vec);
+ 
+         if (sec_req_it->command == sec_req_it->final_command) {
+           if (sec_req_it->type_id == Request::Type::Read) {
+@@ -273,27 +290,31 @@ class HBM3PIMController final : public IDRAMController, public Implementation {
+ 
+         is_pim = false;
+         // 2.2.2    If no request to be scheduled in the priority buffer, check the pim buffer for PIM operations.
+-        if (!request_found) {
+-          auto& buffer = m_pim_buffer;
++        //          (with pim_priority false, the read/write buffers are checked first)
++        auto try_rw = [&]() {
++          // 2.2.3    Check the read and write buffers.
++          set_write_mode();
++          auto& buffer = m_is_write_mode ? m_write_buffer : m_read_buffer;
+           if (req_it = m_scheduler->get_best_request(buffer); req_it != buffer.end()) {
+             request_found = m_dram->check_ready(req_it->command, req_it->addr_vec);
+             req_buffer = &buffer;
+           }
+-          if (request_found) {
+-            is_pim = true;
+-          }
++        };
++        if (!request_found && !m_pim_first) {
++          try_rw();
+         }
+-
+-
+-        // 2.2.3    If no request to be scheduled in the priority buffer, check the read and write buffers.
+         if (!request_found) {
+-          // Query the write policy to decide which buffer to serve
+-          set_write_mode();
+-          auto& buffer = m_is_write_mode ? m_write_buffer : m_read_buffer;
+-          if (req_it = m_scheduler->get_best_request(buffer); req_it != buffer.end()) {
+-            request_found = m_dram->check_ready(req_it->command, req_it->addr_vec);
++          auto& buffer = m_pim_buffer;
++          if (req_it = m_scheduler_pim->get_best_request(buffer); req_it != buffer.end()) {
++            request_found = m_dram_pim->check_ready(req_it->command, req_it->addr_vec);
+             req_buffer = &buffer;
+           }
++          if (request_found) {
++            is_pim = true;
++          }
++        }
++        if (!request_found && m_pim_first) {
++          try_rw();
+         }
+       }
+ 
+@@ -351,31 +372,35 @@ class HBM3PIMController final : public IDRAMController, public Implementation {
+ 
+         is_pim = false;
+         // 2.2.2    If no request to be scheduled in the priority buffer, check the pim buffer for PIM operations.
+-        if (!request_found) {
+-          auto& buffer = m_pim_buffer;
++        //          (with pim_priority false, the read/write buffers are checked first)
++        auto try_rw = [&]() {
++          // 5.2.2    Check the read and write buffers.
++          set_write_mode();
++          auto& buffer = m_is_write_mode ? m_write_buffer : m_read_buffer;
+           if (req_it = m_scheduler->get_best_request(buffer); req_it != buffer.end()) {
+             if (compare_command_type(first_command, req_it->command)) {
+               request_found = m_dram->check_ready(req_it->command, req_it->addr_vec);
+               req_buffer = &buffer;
+             }
+           }
+-          if (request_found) {
+-            is_pim = true;
+-          }
++        };
++        if (!request_found && !m_pim_first) {
++          try_rw();
+         }
+-
+-
+-        // 5.2.2    If no request to be scheduled in the priority buffer, check the read and write buffers.
+         if (!request_found) {
+-          // Query the write policy to decide which buffer to serve
+-          set_write_mode();
+-          auto& buffer = m_is_write_mode ? m_write_buffer : m_read_buffer;
+-          if (req_it = m_scheduler->get_best_request(buffer); req_it != buffer.end()) {
++          auto& buffer = m_pim_buffer;
++          if (req_it = m_scheduler_pim->get_best_request(buffer); req_it != buffer.end()) {
+             if (compare_command_type(first_command, req_it->command)) {
+-              request_found = m_dram->check_ready(req_it->command, req_it->addr_vec);
++              request_found = m_dram_pim->check_ready(req_it->command, req_it->addr_vec);
+               req_buffer = &buffer;
+             }
+           }
++          if (request_found) {
++            is_pim = true;
++          }
++        }
++        if (!request_found && m_pim_first) {
++          try_rw();
+         }
+       }
+ 
+diff --git a/ramulator2/src/dram_controller/impl/scheduler/pim_scheduler.cpp b/ramulator2/src/dram_controller/impl/scheduler/pim_scheduler.cpp
+index 625e50a..7c2ab96 100644
+--- a/ramulator2/src/dram_controller/impl/scheduler/pim_scheduler.cpp
++++ b/ramulator2/src/dram_controller/impl/scheduler/pim_scheduler.cpp
+@@ -15,7 +15,9 @@ class PIM : public IScheduler, public Implementation {
+     void init() override { };
+ 
+     void setup(IFrontEnd* frontend, IMemorySystem* memory_system) override {
+-      m_dram = cast_parent<IDRAMController>()->m_dram;
++      // the PIM-request scheduler of a dual_row_buffer controller uses the PIM row state
++      m_dram = param<bool>("use_pim_dram").default_val(false) ? cast_parent<IDRAMController>()->m_dram_pim
++                                                              : cast_parent<IDRAMController>()->m_dram;
+     };
+ 
+     std::vector<AddrVec_t> rowhit_list;
+diff --git a/ramulator2/src/frontend/CMakeLists.txt b/ramulator2/src/frontend/CMakeLists.txt
+index 03990ff..d5994ed 100644
+--- a/ramulator2/src/frontend/CMakeLists.txt
++++ b/ramulator2/src/frontend/CMakeLists.txt
+@@ -6,6 +6,7 @@ target_sources(
+ 
+   impl/memory_trace/loadstore_trace.cpp
+   impl/memory_trace/pim_loadstore_trace.cpp
++  impl/memory_trace/pim_dual_trace.cpp
+ )
+ 
+ target_link_libraries(
+diff --git a/ramulator2/src/frontend/impl/memory_trace/pim_dual_trace.cpp b/ramulator2/src/frontend/impl/memory_trace/pim_dual_trace.cpp
+new file mode 100644
+index 0000000..072ae25
+--- /dev/null
++++ b/ramulator2/src/frontend/impl/memory_trace/pim_dual_trace.cpp
+@@ -0,0 +1,164 @@
++#include <filesystem>
++#include <iostream>
++#include <fstream>
++
++#include "frontend/frontend.h"
++#include "base/exception.h"
++
++namespace Ramulator {
++
++namespace fs = std::filesystem;
++
++// a PIM command trace and a concurrent stream of reads (a GPU streaming weights while PIM runs).
++// The two streams are sent independently, so a full PIM buffer does not hold back the reads and vice versa (the
++// single-stream PIMLoadStoreTrace sends in trace order). The read stream wraps around and runs while the PIM trace has
++// requests left; read_rate limits it to that many reads per memory cycle (< 0: as many as the controllers take, 0: none).
++// With read_count > 0 the read stream sends read_count reads and stops (with or without a PIM trace); the run ends
++// when both streams are sent and the controllers have drained.
++class PIMDualTrace : public IFrontEnd, public Implementation {
++  RAMULATOR_REGISTER_IMPLEMENTATION(IFrontEnd, PIMDualTrace, "PIMDualTrace", "PIM trace with a concurrent read stream.")
++
++  private:
++    struct Trace {
++      int req_type;
++      Addr_t addr;
++    };
++    std::vector<Trace> m_pim;
++    std::vector<Addr_t> m_reads;
++    size_t m_pim_idx = 0;
++    size_t m_rd_idx = 0;
++    double m_read_rate = -1.0;
++    double m_budget = 0.0;
++    size_t m_read_count = 0;
++
++    uint64_t m_cycle = 0;
++    size_t s_reads_sent = 0;
++    size_t s_pim_sent = 0;
++    uint64_t s_pim_sent_cycle = 0;
++    uint64_t s_reads_sent_cycle = 0;
++
++    Logger_t m_logger;
++
++  public:
++    void init() override {
++      std::string pim_path = param<std::string>("path").desc("PIM trace (empty: read-only run).").default_val("");
++      std::string read_path = param<std::string>("read_path").desc("Read address list, one address per line.").required();
++      m_clock_ratio = param<uint>("clock_ratio").required();
++      m_read_rate = param<double>("read_rate").desc("Reads per memory cycle (< 0: unlimited, 0: none).").default_val(-1.0);
++      m_read_count = param<size_t>("read_count").desc("Reads to send in a read-only run.").default_val(0);
++
++      m_logger = Logging::create_logger("PIMDualTrace");
++      if (!pim_path.empty()) {
++        load_pim(pim_path);
++      }
++      load_reads(read_path);
++      m_logger->info("Loaded {} PIM requests and {} read addresses.", m_pim.size(), m_reads.size());
++
++      register_stat(s_reads_sent).name("dual_reads_sent");
++      register_stat(s_pim_sent).name("dual_pim_sent");
++      register_stat(s_pim_sent_cycle).name("dual_pim_sent_cycle");
++      register_stat(s_reads_sent_cycle).name("dual_reads_sent_cycle");
++    };
++
++    void tick() override {
++      m_cycle++;
++      // PIM stream first (the controller also gives PIM priority over reads)
++      while (m_pim_idx < m_pim.size()) {
++        const Trace& t = m_pim[m_pim_idx];
++        if (!m_memory_system->send({t.addr, t.req_type})) {
++          break;
++        }
++        m_pim_idx++;
++        s_pim_sent++;
++      }
++      if (!m_pim.empty() && m_pim_idx == m_pim.size() && s_pim_sent_cycle == 0) {
++        s_pim_sent_cycle = m_cycle;
++      }
++      // read stream
++      bool reads_on = m_read_count > 0 ? (s_reads_sent < m_read_count) : (!m_pim.empty() && m_pim_idx < m_pim.size());
++      if (!reads_on || m_reads.empty() || m_read_rate == 0.0) {
++        return;
++      }
++      if (m_read_rate > 0) {
++        m_budget = std::min(m_budget + m_read_rate, m_read_rate + 64.0);
++      }
++      while ((m_read_rate < 0 || m_budget >= 1.0) && (m_read_count == 0 || s_reads_sent < m_read_count)) {
++        if (!m_memory_system->send({m_reads[m_rd_idx], Request::Type::Read})) {
++          break;
++        }
++        m_rd_idx = (m_rd_idx + 1) % m_reads.size();
++        s_reads_sent++;
++        if (m_read_rate > 0) {
++          m_budget -= 1.0;
++        }
++      }
++      if (m_read_count > 0 && s_reads_sent >= m_read_count && s_reads_sent_cycle == 0) {
++        s_reads_sent_cycle = m_cycle;
++      }
++    };
++
++    bool is_finished() override {
++      bool pim_done = m_pim_idx >= m_pim.size();
++      bool reads_done = m_read_count == 0 || s_reads_sent >= m_read_count;
++      return pim_done && reads_done;
++    };
++
++  private:
++    static int pim_type(const std::string& tok) {
++      if (tok == "LD")             return Request::Type::Read;
++      if (tok == "ST")             return Request::Type::Write;
++      if (tok == "PIM_MAC_AB")     return Request::Type::PIM_MAC_AB;
++      if (tok == "PIM_MAC_SB")     return Request::Type::PIM_MAC_SB;
++      if (tok == "PIM_MAC_PB")     return Request::Type::PIM_MAC_PB;
++      if (tok == "PIM_WR_GB")      return Request::Type::PIM_WR_GB;
++      if (tok == "PIM_MV_SB")      return Request::Type::PIM_MV_SB;
++      if (tok == "PIM_MV_GB")      return Request::Type::PIM_MV_GB;
++      if (tok == "PIM_SFM")        return Request::Type::PIM_SFM;
++      if (tok == "PIM_SET_MODEL")  return Request::Type::PIM_SET_MODEL;
++      if (tok == "PIM_SET_HEAD")   return Request::Type::PIM_SET_HEAD;
++      if (tok == "PIM_BARRIER")    return Request::Type::PIM_BARRIER;
++      return -1;
++    }
++
++    static Addr_t parse_addr(const std::string& tok) {
++      if (tok.compare(0, 2, "0x") == 0 || tok.compare(0, 2, "0X") == 0) {
++        return std::stoll(tok.substr(2), nullptr, 16);
++      }
++      return std::stoll(tok);
++    }
++
++    void load_pim(const std::string& path) {
++      if (!fs::exists(path)) {
++        throw ConfigurationError("Trace {} does not exist!", path);
++      }
++      std::ifstream f(path);
++      std::string line;
++      while (std::getline(f, line)) {
++        std::vector<std::string> tokens;
++        tokenize(tokens, line, " ");
++        if (tokens.size() != 2) {
++          throw ConfigurationError("Trace {} format invalid!", path);
++        }
++        int type = pim_type(tokens[0]);
++        if (type < 0) {
++          throw ConfigurationError("Trace {} format invalid!", path);
++        }
++        m_pim.push_back({type, parse_addr(tokens[1])});
++      }
++    }
++
++    void load_reads(const std::string& path) {
++      if (!fs::exists(path)) {
++        throw ConfigurationError("Read list {} does not exist!", path);
++      }
++      std::ifstream f(path);
++      std::string line;
++      while (std::getline(f, line)) {
++        if (!line.empty()) {
++          m_reads.push_back(parse_addr(line));
++        }
++      }
++    }
++};
++
++}        // namespace Ramulator
+diff --git a/ramulator2/src/memory_system/impl/PIM_DRAM_system.cpp b/ramulator2/src/memory_system/impl/PIM_DRAM_system.cpp
+index b952158..8517bb5 100644
+--- a/ramulator2/src/memory_system/impl/PIM_DRAM_system.cpp
++++ b/ramulator2/src/memory_system/impl/PIM_DRAM_system.cpp
+@@ -12,6 +12,7 @@ class PIMDRAMSystem final : public IMemorySystem, public Implementation {
+   protected:
+     Clk_t m_clk = 0;
+     IDRAM*  m_dram;
++    IDRAM*  m_dram_pim = nullptr;   // dual_row_buffer
+     IAddrMapper*  m_addr_mapper;
+     std::vector<IDRAMController*> m_controllers;
+ 
+@@ -34,6 +35,11 @@ class PIMDRAMSystem final : public IMemorySystem, public Implementation {
+     void init() override { 
+       // Create device (a top-level node wrapping all channel nodes)
+       m_dram = create_child_ifce<IDRAM>();
++      // with dual_row_buffer, PIM commands track their own rows in a second DRAM state
++      if (param<bool>("dual_row_buffer").desc("Separate row buffers for PIM commands.").default_val(false)) {
++        m_dram_pim = create_child_ifce<IDRAM>();
++        m_dram_pim->m_impl->set_id("DRAM_PIM");
++      }
+       m_addr_mapper = create_child_ifce<IAddrMapper>();
+ 
+       int num_channels = m_dram->get_level_size("channel");   
+@@ -132,6 +138,9 @@ class PIMDRAMSystem final : public IMemorySystem, public Implementation {
+     void tick() override {
+       m_clk++;
+       m_dram->tick();
++      if (m_dram_pim) {
++        m_dram_pim->tick();
++      }
+       for (auto controller : m_controllers) {
+         controller->tick();
+       }

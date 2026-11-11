@@ -1,0 +1,58 @@
+{
+ "x0": {
+  "direct": {
+   "a_G": 0.02255,
+   "a_M": 0.187272,
+   "ratio": 1.178723,
+   "rm_b": 0.175629,
+   "rm_b_x": 0.207018,
+   "a_M_local": 0.180563,
+   "a_M_amp": 0.186757,
+   "beta_every_bank": 1.128185,
+   "beta_every_bank_reg": 1.087765,
+   "beta_every_bank_amp": 1.090764,
+   "beta_base_die": 1.841101,
+   "beta_uniform_dram": 1.034306,
+   "gpu_die_per_nonmem_W": 0.056842,
+   "gpu_die_per_mem_W": 0.019138,
+   "base_over_dram": 1.780035
+  },
+  "interpolated": {
+   "a_G": 0.02259,
+   "a_M": 0.18774,
+   "ratio": 1.17852,
+   "beta_every_bank": 1.12833,
+   "a_M_local": 0.18097,
+   "beta_base_die": 1.84649,
+   "beta_uniform_dram": 1.03428
+  }
+ },
+ "best": {
+  "direct": {
+   "a_G": 0.022628,
+   "a_M": 0.187708,
+   "ratio": 0.699151,
+   "rm_b": 0.176747,
+   "rm_b_x": 0.123573,
+   "a_M_local": 0.182135,
+   "a_M_amp": 0.187036,
+   "beta_every_bank": 0.65916,
+   "beta_every_bank_reg": 0.63959,
+   "beta_every_bank_amp": 0.641886,
+   "beta_base_die": 1.03687,
+   "beta_uniform_dram": 0.636781,
+   "gpu_die_per_nonmem_W": 0.055672,
+   "gpu_die_per_mem_W": 0.017905,
+   "base_over_dram": 1.628298
+  },
+  "interpolated": {
+   "a_G": 0.02259,
+   "a_M": 0.18774,
+   "ratio": 0.70109,
+   "beta_every_bank": 0.66114,
+   "a_M_local": 0.18207,
+   "beta_base_die": 1.04004,
+   "beta_uniform_dram": 0.63844
+  }
+ }
+}

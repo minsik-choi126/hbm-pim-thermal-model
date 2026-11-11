@@ -1,0 +1,35 @@
+{
+ "x0": {
+  "combo": {
+   "gpu": 332.70658,
+   "uni": 16.019026,
+   "array": 10.054604,
+   "edge": 0.365622
+  },
+  "max_abs_diff_K": 0.009005,
+  "worst_layer": "L1",
+  "peak_dram_rise_combo_K": 32.94,
+  "peak_dram_rise_sum_K": 32.938378,
+  "coarse_combo_K": 31.94,
+  "coarse_sum_K": 31.935689,
+  "rel_diff_peak": 4.9e-05,
+  "combo_energy_balance_pct": 2.68302
+ },
+ "best": {
+  "combo": {
+   "gpu": 332.70658,
+   "uni": 0.398714,
+   "base": 15.620312,
+   "array": 10.054604,
+   "edge": 0.365622
+  },
+  "max_abs_diff_K": 0.008875,
+  "worst_layer": "L5",
+  "peak_dram_rise_combo_K": 28.67,
+  "peak_dram_rise_sum_K": 28.665449,
+  "coarse_combo_K": 28.095,
+  "coarse_sum_K": 28.096075,
+  "rel_diff_peak": 0.000159,
+  "combo_energy_balance_pct": 2.271805
+ }
+}

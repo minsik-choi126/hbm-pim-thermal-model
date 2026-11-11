@@ -1,0 +1,30 @@
+{
+ "note": "Memory power the GPU reports (NVML) with a memory-copy kernel at full duty and at idle, mean over the settled rows of the measurement runs, divided by the number of HBM stacks. Dynamic power per stack = full_copy - idle.",
+ "unit": "W per stack",
+ "source": {
+  "repository": "private measurement repository, commit 38e0926 (it contains every file below)",
+  "column": "mem_power_w (nvidia-smi 'GPU Memory Power', memory-subsystem 1 s average)",
+  "rows": "settled rows; full_copy = mode 'mem' rows and memsweep rows at duty 1.00; idle = mode 'idle' rows",
+  "H100": "experiments/exp1_coupling/h100_*.csv; 5 full-copy / 7 idle rows",
+  "H200": "experiments/0922_h200/out/exp1/gpu0/h200_*.csv; 6 full-copy / 11 idle rows. One of the three H200 cards measured (device index 0); its full-copy value is the middle one (the other two cards -1.3 % / +1.6 %)",
+  "B200": "experiments/0925_b200/out/exp1/b200_*.csv; 5 full-copy / 9 idle rows",
+  "caveat": "the copy kernel reads and writes with activations, so energies referred to it are those of a copy, not of a read-only stream"
+ },
+ "gpus": {
+  "H100": {
+   "stacks": 5,
+   "full_copy": 30.867200000000004,
+   "idle": 7.283714285714287
+  },
+  "H200": {
+   "stacks": 6,
+   "full_copy": 33.29805555555556,
+   "idle": 7.159393939393941
+  },
+  "B200": {
+   "stacks": 8,
+   "full_copy": 30.148500000000002,
+   "idle": 4.326527777777778
+  }
+ }
+}

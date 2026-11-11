@@ -1,0 +1,83 @@
+{
+ "config": "HBM-Power main 61aada9 config/HBM3E_6400MTs/power.json",
+ "timing": "HBM-Power v0.3-alpha sources/figure16/configs/HBM3_6400Mbps_timing.json",
+ "VDD": 1.1,
+ "rate_Gbps": 6.4,
+ "e_act_pJ": 1716.0687499999997,
+ "read_pJ_bit": 4.256969697355918,
+ "read_scale_random": 1.6191427133782,
+ "read_terms_pJ_bit": {
+  "floor": 2.629150390625001,
+  "dq": 0.4299510041905153,
+  "tsv": 0.6149539603205686,
+  "bg_bus": 0.5829143422198331
+ },
+ "read_floor_allzero_pJ_bit": 2.6291503906250004,
+ "unit": "pJ/bit",
+ "patterns": {
+  "whole_row": {
+   "reads_per_act": 32,
+   "act": 0.20948104858398434,
+   "floor": 2.629150390625001,
+   "bg_bus": 0.5829143422198331,
+   "tsv": 0.6149539603205686,
+   "io_dq": 0.4299510041905153,
+   "standby": 0.0037597656250000157,
+   "dram_core": 3.421545781428818,
+   "in_stack": 4.470210511564902,
+   "core_share": 0.7654104370648589,
+   "tsv_share": 0.13756711428457752,
+   "io_share": 0.09618137738215841,
+   "x_lo": 0.09618137738215841,
+   "x_mid": 0.16496493452444716,
+   "x_hi": 0.23374849166673595
+  },
+  "four_reads": {
+   "reads_per_act": 4,
+   "act": 1.6758483886718747,
+   "floor": 2.629150390625001,
+   "bg_bus": 0.5829143422198331,
+   "tsv": 0.6149539603205686,
+   "io_dq": 0.4299510041905153,
+   "standby": 0.0037597656250000157,
+   "dram_core": 4.887913121516709,
+   "in_stack": 5.936577851652793,
+   "core_share": 0.8233553477540723,
+   "tsv_share": 0.10358728137446395,
+   "io_share": 0.07242404882651599,
+   "x_lo": 0.07242404882651599,
+   "x_mid": 0.12421768951374797,
+   "x_hi": 0.17601133020097995
+  }
+ },
+ "base_die_share": {
+  "prior": 0.16496493452444716,
+  "range": [
+   0.07242404882651599,
+   0.23374849166673595
+  ]
+ },
+ "h200_measured": {
+  "n": 3,
+  "active_pJ_bit": 5.8017342581848474,
+  "active_pJ_bit_range": [
+   5.726872246696035,
+   5.867583949033314
+  ],
+  "total_W_mean": 248.2266666666667,
+  "read_GBs_mean": 4520.400000000001
+ },
+ "runner_check": {
+  "ran": true,
+  "act_pJ": 1716.064,
+  "read_pJ_bit": 4.25696875,
+  "read_allzero_pJ_bit": 2.62915625,
+  "reads_per_act": 4.0,
+  "device_total_W": 248.22912,
+  "device_idle_W": 17.185152000000002,
+  "device_read_TBs": 4.913173316007147,
+  "active_pJ_bit": 5.878175700805663,
+  "vs_measured_active": 0.01317561943016865,
+  "vs_measured_total": 9.88343986674245e-06
+ }
+}

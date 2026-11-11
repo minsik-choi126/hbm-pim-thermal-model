@@ -1,0 +1,262 @@
+diff --git a/sources/drampower/src/DRAMPower/DRAMPower/memspec/MemSpecHBM3.h b/sources/drampower/src/DRAMPower/DRAMPower/memspec/MemSpecHBM3.h
+index ae66bba..857393b 100644
+--- a/sources/drampower/src/DRAMPower/DRAMPower/memspec/MemSpecHBM3.h
++++ b/sources/drampower/src/DRAMPower/DRAMPower/memspec/MemSpecHBM3.h
+@@ -54,6 +54,7 @@ public:
+         uint64_t tWR;
+         uint64_t tRP;
+         uint64_t tBurst;
++        uint64_t tRFC = 0;          // all-bank refresh cycle time (cycles); 0 = refresh not modeled
+     };
+ 
+     struct MemPowerSpec
+@@ -68,6 +69,7 @@ public:
+         double iDD3N16;            // active standby, all banks open
+         double iDD4R;
+         double iDD4W;
++        double iDD5B = 0.0;        // all-bank refresh current (mA); 0 = refresh not modeled
+ 
+         std::vector<double> bankgroup_scaling_factors; // to account for variation between bankgroups
+         std::vector<double> bank_scaling_factors; // to account for variation between banks
+diff --git a/sources/drampower/src/DRAMPower/DRAMPower/standards/hbm3/HBM3.cpp b/sources/drampower/src/DRAMPower/DRAMPower/standards/hbm3/HBM3.cpp
+index 4c8d52e..1e37021 100644
+--- a/sources/drampower/src/DRAMPower/DRAMPower/standards/hbm3/HBM3.cpp
++++ b/sources/drampower/src/DRAMPower/DRAMPower/standards/hbm3/HBM3.cpp
+@@ -30,6 +30,8 @@ namespace DRAMPower {
+         this->registerBankHandler<CmdType::RDA>(&HBM3::handleReadAuto);
+         // WRA
+         this->registerBankHandler<CmdType::WRA>(&HBM3::handleWriteAuto);
++        // REFA (all-bank refresh) -- was unregistered: REFA in a trace was silently dropped
++        this->registerRankHandler<CmdType::REFA>(&HBM3::handleRefAll);
+         // EOS
+         routeCommand<CmdType::END_OF_SIMULATION>([this](const Command &cmd) {
+             this->endOfSimulation(cmd.timestamp);
+@@ -81,6 +83,33 @@ namespace DRAMPower {
+         }
+     }
+ 
++    void HBM3::handleRefAll(Rank &rank, timestamp_t timestamp) {
++        // Mirrors DDR4::handleRefAll: every bank is busy (active) for tRFC, then implicitly
++        // precharged. The rank-active interval feeds E_bg_act_shared for the window; the excess
++        // refresh current (IDD5B - IDD3N1) is charged per bank in core_calculation_HBM3.
++        auto tRFC = memSpec.memTimingSpec.tRFC;
++        if (tRFC == 0) {
++            static bool warned = false;
++            if (!warned) { std::cout << "[WARN] REFA seen but tRFC == 0: refresh energy NOT modeled" << std::endl; warned = true; }
++            return;
++        }
++        auto timestamp_end = timestamp + tRFC;
++        rank.endRefreshTime = timestamp_end;
++        rank.cycles.act.start_interval_if_not_running(timestamp);
++        for (auto &bank : rank.banks) {
++            bank.bankState = Bank::BankState::BANK_ACTIVE;
++            ++bank.counter.refAllBank;
++            bank.cycles.act.start_interval_if_not_running(timestamp);
++            bank.refreshEndTime = timestamp_end;
++            addImplicitCommand(timestamp_end, [this, &bank, &rank, timestamp_end]() {
++                bank.bankState = Bank::BankState::BANK_PRECHARGED;
++                bank.cycles.act.close_interval(timestamp_end);
++                if (!rank.isActive(timestamp_end))
++                    rank.cycles.act.close_interval(timestamp_end);
++            });
++        }
++    }
++
+     void HBM3::handleRead(Rank &, Bank &bank, timestamp_t) {
+         ++bank.counter.reads;
+     }
+diff --git a/sources/drampower/src/DRAMPower/DRAMPower/standards/hbm3/HBM3.h b/sources/drampower/src/DRAMPower/DRAMPower/standards/hbm3/HBM3.h
+index b6a9933..d39d3ab 100644
+--- a/sources/drampower/src/DRAMPower/DRAMPower/standards/hbm3/HBM3.h
++++ b/sources/drampower/src/DRAMPower/DRAMPower/standards/hbm3/HBM3.h
+@@ -39,6 +39,7 @@ public:
+     void handleAct(Rank &rank, Bank &bank, timestamp_t timestamp);
+     void handlePre(Rank &rank, Bank &bank, timestamp_t timestamp);
+     void handlePreAll(Rank &rank, timestamp_t timestamp);
++    void handleRefAll(Rank &rank, timestamp_t timestamp);
+     void handleRead(Rank &rank, Bank &bank, timestamp_t timestamp);
+     void handleWrite(Rank &rank, Bank &bank, timestamp_t timestamp);
+     void handleReadAuto(Rank &rank, Bank &bank, timestamp_t timestamp);
+diff --git a/sources/drampower/src/DRAMPower/DRAMPower/standards/hbm3/core_calculation_HBM3.cpp b/sources/drampower/src/DRAMPower/DRAMPower/standards/hbm3/core_calculation_HBM3.cpp
+index e62966e..19600ac 100644
+--- a/sources/drampower/src/DRAMPower/DRAMPower/standards/hbm3/core_calculation_HBM3.cpp
++++ b/sources/drampower/src/DRAMPower/DRAMPower/standards/hbm3/core_calculation_HBM3.cpp
+@@ -38,12 +38,17 @@ namespace DRAMPower {
+         return VDD * (IDD4W - IDD3N) * (double(BL) / DR) * t_CK * N_WR;
+     }
+ 
++    double Calculation_HBM3::E_ref_ab(std::size_t B, double VDD, double IDD5B, double IDD3N, double t_RFC, uint64_t N_REF) {
++        return (1.0 / B) * VDD * (IDD5B - IDD3N) * t_RFC * N_REF;
++    }
++
+     energy_t Calculation_HBM3::calcEnergy(timestamp_t timestamp, HBM3 &dram) {
+         auto stats = dram.getWindowStats(timestamp);
+ 
+         double t_CK = dram.memSpec.memTimingSpec.tCK;
+         auto t_RAS = dram.memSpec.memTimingSpec.tRAS * t_CK;
+         auto t_RP = dram.memSpec.memTimingSpec.tRP * t_CK;
++        auto t_RFC = dram.memSpec.memTimingSpec.tRFC * t_CK;
+ 
+         auto rho = dram.memSpec.bwParams.bwPowerFactRho;
+         auto BL = dram.memSpec.burstLength;
+@@ -70,6 +75,7 @@ namespace DRAMPower {
+             if (dp.apply_to_writes)
+                 iDD4W_mA = dp.effective_current_mA(iDD4W_mA, idd3n1_mA);
+         }
++        auto IDD5B   = dram.memSpec.memPowerSpec.iDD5B   * 1e-3;
+         auto IDD4R   = iDD4R_mA * 1e-3;
+         auto IDD4W   = iDD4W_mA * 1e-3;
+ 
+@@ -144,6 +150,8 @@ namespace DRAMPower {
+ 
+             energy.bank_energy[b].E_pre_WRA +=
+                 E_pre(VDD, IBeta, IDD2N, t_RP, bank.counter.writeAuto);
++            energy.bank_energy[b].E_ref_AB +=
++                E_ref_ab(B, VDD, IDD5B, IDD3N1, t_RFC, bank.counter.refAllBank);
+         }
+ 
+         energy.E_bg_act_shared +=
+diff --git a/sources/drampower/src/DRAMPower/DRAMPower/standards/hbm3/core_calculation_HBM3.h b/sources/drampower/src/DRAMPower/DRAMPower/standards/hbm3/core_calculation_HBM3.h
+index 48b0d6d..5ac5c5c 100644
+--- a/sources/drampower/src/DRAMPower/DRAMPower/standards/hbm3/core_calculation_HBM3.h
++++ b/sources/drampower/src/DRAMPower/DRAMPower/standards/hbm3/core_calculation_HBM3.h
+@@ -26,6 +26,9 @@ private:
+     // Write energy: excess current during burst write
+     double E_WR(double VDD, double IDD4W, double IDD3N, double t_CK, std::size_t BL, std::size_t DR, uint64_t N_WR);
+ 
++    // All-bank refresh energy: excess current over active standby for tRFC, split over B banks
++    double E_ref_ab(std::size_t B, double VDD, double IDD5B, double IDD3N, double t_RFC, uint64_t N_REF);
++
+ public:
+     energy_t calcEnergy(timestamp_t timestamp, HBM3 &dram);
+ };
+diff --git a/sources/drampower/src/cli/main/HBM3_runner.cpp b/sources/drampower/src/cli/main/HBM3_runner.cpp
+index 90e1ecf..d914efc 100644
+--- a/sources/drampower/src/cli/main/HBM3_runner.cpp
++++ b/sources/drampower/src/cli/main/HBM3_runner.cpp
+@@ -14,6 +14,8 @@
+ #include <DRAMPower/memspec/MemSpecHBM3.h>
+ #include <DRAMPower/data/energy.h>
+ 
++#include "hbm_report.hpp"
++
+ #include <nlohmann/json.hpp>
+ 
+ #include <spdlog/spdlog.h>
+@@ -54,6 +56,24 @@ static MemSpecHBM3 buildMemSpec(const json &orgJson, const json &timingJson, con
+     timing.tWTR_L  = t.value("nWTR_L", 0);
+     timing.tWR     = t.value("nWR", 0);
+     timing.tRP     = t.value("nRP", 0);
++    // All-bank refresh cycle time. HBM-Power's timing JSONs carry only nRFCpb (per-bank);
++    // nRFC (all-bank) is required for REFA energy. Absent -> documented placeholder.
++    if (t.contains("nRFC")) {
++        timing.tRFC = t.value("nRFC", 0);
++    } else {
++        // All-bank tRFC by die density, same table ramulator2 uses to schedule REFab in the traces
++        // (dram/impl/HBM3.cpp tRFC_TABLE, ns): 2Gb 160, 4Gb 260, 8Gb 350, 16Gb 450, 24Gb 610, 32Gb 650.
++        // nRFCpb in HBM-Power's JSON is the SAME-BANK refresh window and must not be used here.
++        // Density is a DIE property (HBM-Power's org JSON is titled "HBM3 16Gb die"); optional
++        // "die_density_Gb" in the org JSON overrides the 16 Gb default.
++        const double gbit = orgJson.value("die_density_Gb", 16.0);
++        double trfc_ns = 450.0;
++        if (gbit <= 2.5) trfc_ns = 160; else if (gbit <= 5) trfc_ns = 260; else if (gbit <= 9) trfc_ns = 350;
++        else if (gbit <= 17) trfc_ns = 450; else if (gbit <= 25) trfc_ns = 610; else trfc_ns = 650;
++        timing.tRFC = static_cast<uint64_t>(trfc_ns * 1000.0 / timing.tCK + 0.5);
++        spdlog::warn("timing JSON has no nRFC: using tRFCab = {} ns = {} cycles from the ramulator2 density table "
++                     "({:.0f} Gb die; not a datasheet number). Add \"nRFC\" or \"die_density_Gb\" to override.", trfc_ns, timing.tRFC, gbit);
++    }
+     // tBurst is computed in MemSpecHBM3 constructor from burstLength / dataRate
+ 
+     // Power
+@@ -68,6 +88,22 @@ static MemSpecHBM3 buildMemSpec(const json &orgJson, const json &timingJson, con
+     power.iDD3N16 = idd.value("IDD3N16", 0.0);
+     power.iDD4R   = idd.value("IDD4R", 0.0);
+     power.iDD4W   = idd.value("IDD4W", 0.0);
++    // All-bank refresh current. Not in HBM-Power's measured IDD set. Absent -> DERIVED placeholder:
++    // a REFA performs one row cycle in each of the B banks within tRFC, so the excess over active
++    // standby is B * (IDD0 - IDD3N1) * tRC / tRFC (charge conservation from the measured IDD0 cycle).
++    if (idd.contains("IDD5B")) {
++        power.iDD5B = idd.value("IDD5B", 0.0);
++    } else {
++        const double B = double(arch.nbrOfBankGroups * arch.nbrOfBanks);
++        // rows refreshed per bank per REFA = rows / (tREFW / tREFI), tREFW = 32 ms (JEDEC, <= 85 C)
++        const double nREFI = t.value("nREFI", 0.0);
++        const double rowsPerRef = (nREFI > 0) ? double(arch.nbrOfRows) / (32.0e-3 / (nREFI * timing.tCK * 1e-12)) : 1.0;
++        const double excess = (timing.tRFC > 0) ? rowsPerRef * B * (power.iDD0 - power.iDD3N1) * double(timing.tRC) / double(timing.tRFC) : 0.0;
++        power.iDD5B = power.iDD3N1 + excess;
++        spdlog::warn("power JSON has no IDD5B (all-bank refresh current): using DERIVED placeholder IDD5B = IDD3N1 + "
++                     "rowsPerREF*B*(IDD0-IDD3N1)*tRC/tRFC = {:.1f} mA (rowsPerREF={:.2f}, B={}, IDD0={}, IDD3N1={}, tRC={}, tRFC={}). Not measured.",
++                     power.iDD5B, rowsPerRef, int(B), power.iDD0, power.iDD3N1, timing.tRC, timing.tRFC);
++    }
+ 
+     MemSpecHBM3 spec(arch, timing, power);
+ 
+@@ -112,7 +148,8 @@ static json loadJson(const std::string &path)
+ // Extract optional data-pattern knob overrides (--dq-rate=, --tsv-rate=, --bg-rate=)
+ // from argv, leaving only positional arguments.
+ static void extractRateOverrides(int &argc, char *argv[],
+-        std::optional<double> &dq, std::optional<double> &tsv, std::optional<double> &bg)
++        std::optional<double> &dq, std::optional<double> &tsv, std::optional<double> &bg,
++        std::optional<std::string> &jsonOut)
+ {
+     int w = 1;
+     for (int i = 1; i < argc; ++i) {
+@@ -122,6 +159,7 @@ static void extractRateOverrides(int &argc, char *argv[],
+             if (a.rfind(pfx, 0) == 0) { dst = std::stod(a.substr(pfx.size())); return true; }
+             return false;
+         };
++        if (a.rfind("--json=", 0) == 0) { jsonOut = a.substr(7); continue; }
+         if (eat("--dq-rate", dq) || eat("--tsv-rate", tsv) || eat("--bg-rate", bg)) continue;
+         argv[w++] = argv[i];
+     }
+@@ -131,11 +169,12 @@ static void extractRateOverrides(int &argc, char *argv[],
+ int main(int argc, char *argv[])
+ {
+     std::optional<double> ovDqRate, ovTsvRate, ovBgRate;
+-    extractRateOverrides(argc, argv, ovDqRate, ovTsvRate, ovBgRate);
++    std::optional<std::string> jsonOut;
++    extractRateOverrides(argc, argv, ovDqRate, ovTsvRate, ovBgRate, jsonOut);
+ 
+     if (argc < 5 || argc > 6) {
+         spdlog::error("Usage: {} <organization.json> <timing.json> <power.json> <trace.csv> [variation.json] "
+-                      "[--dq-rate=R] [--tsv-rate=R] [--bg-rate=R]", argv[0]);
++                      "[--dq-rate=R] [--tsv-rate=R] [--bg-rate=R] [--json=out.json]", argv[0]);
+         return 1;
+     }
+ 
+@@ -233,6 +272,17 @@ int main(int argc, char *argv[])
+     // Simulate each pseudo-channel independently
+     double totalEnergy = 0.0;
+     timestamp_t maxElapsedCycles = 0;
++    hbm_report::Totals totals;
++    nlohmann::json pcReports = nlohmann::json::array();
++    nlohmann::json runConfig = {
++        {"standard", "HBM3"},
++        {"organization", orgFile}, {"timing", timingFile}, {"power", powerFile},
++        {"trace", traceFile}, {"variation", variationFile},
++        {"datapattern", {{"enabled", memSpec.dataPattern.enabled},
++                         {"dq_rate", memSpec.dataPattern.dq_rate},
++                         {"tsv_rate", memSpec.dataPattern.tsv_rate},
++                         {"bg_rate", memSpec.dataPattern.bg_rate}}}
++    };
+ 
+     for (const auto &[key, entries] : perPseudoChannel) {
+         auto [ch, pch] = key;
+@@ -267,6 +317,9 @@ int main(int argc, char *argv[])
+         for (std::size_t b = 0; b < bankCount; ++b) {
+             spdlog::info("  Bank {:2d} : {}", b, coreEnergy.bank_energy[b]);
+         }
++
++        pcReports.push_back(hbm_report::pseudoChannelReport(ch, pch, entries.size(), lastTime,
++            memSpec.memTimingSpec.tCK, coreEnergy, ifEnergy, dram, totals));
+     }
+ 
+     // Total average power
+@@ -277,5 +330,7 @@ int main(int argc, char *argv[])
+     spdlog::info("Elapsed cycles: {}, duration: {:.3f} ns", maxElapsedCycles, totalDuration_ps / 1e3);
+     spdlog::info("Average power: {:.3f} mW", totalPower_mW);
+ 
++    hbm_report::finish(totals, maxElapsedCycles, memSpec.memTimingSpec.tCK, pcReports, jsonOut, runConfig);
++
+     return 0;
+ }

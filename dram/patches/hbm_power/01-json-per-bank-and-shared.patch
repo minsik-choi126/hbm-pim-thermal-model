@@ -1,0 +1,353 @@
+diff --git a/sources/drampower/src/cli/main/HBM2_runner.cpp b/sources/drampower/src/cli/main/HBM2_runner.cpp
+index c44c737..6734312 100644
+--- a/sources/drampower/src/cli/main/HBM2_runner.cpp
++++ b/sources/drampower/src/cli/main/HBM2_runner.cpp
+@@ -14,6 +14,8 @@
+ #include <DRAMPower/memspec/MemSpecHBM2.h>
+ #include <DRAMPower/data/energy.h>
+ 
++#include "hbm_report.hpp"
++
+ #include <nlohmann/json.hpp>
+ 
+ #include <spdlog/spdlog.h>
+@@ -110,7 +112,8 @@ static json loadJson(const std::string &path)
+ // from argv, leaving only positional arguments. Lets users sweep activity without
+ // editing the power JSON.
+ static void extractRateOverrides(int &argc, char *argv[],
+-        std::optional<double> &dq, std::optional<double> &tsv, std::optional<double> &bg)
++        std::optional<double> &dq, std::optional<double> &tsv, std::optional<double> &bg,
++        std::optional<std::string> &jsonOut)
+ {
+     int w = 1;
+     for (int i = 1; i < argc; ++i) {
+@@ -120,6 +123,7 @@ static void extractRateOverrides(int &argc, char *argv[],
+             if (a.rfind(pfx, 0) == 0) { dst = std::stod(a.substr(pfx.size())); return true; }
+             return false;
+         };
++        if (a.rfind("--json=", 0) == 0) { jsonOut = a.substr(7); continue; }
+         if (eat("--dq-rate", dq) || eat("--tsv-rate", tsv) || eat("--bg-rate", bg)) continue;
+         argv[w++] = argv[i];
+     }
+@@ -129,11 +133,12 @@ static void extractRateOverrides(int &argc, char *argv[],
+ int main(int argc, char *argv[])
+ {
+     std::optional<double> ovDqRate, ovTsvRate, ovBgRate;
+-    extractRateOverrides(argc, argv, ovDqRate, ovTsvRate, ovBgRate);
++    std::optional<std::string> jsonOut;
++    extractRateOverrides(argc, argv, ovDqRate, ovTsvRate, ovBgRate, jsonOut);
+ 
+     if (argc < 5 || argc > 6) {
+         spdlog::error("Usage: {} <organization.json> <timing.json> <power.json> <trace.csv> [variation.json] "
+-                      "[--dq-rate=R] [--tsv-rate=R] [--bg-rate=R]", argv[0]);
++                      "[--dq-rate=R] [--tsv-rate=R] [--bg-rate=R] [--json=out.json]", argv[0]);
+         return 1;
+     }
+ 
+@@ -231,6 +236,17 @@ int main(int argc, char *argv[])
+     // Simulate each pseudo-channel independently
+     double totalEnergy = 0.0;
+     timestamp_t maxElapsedCycles = 0;
++    hbm_report::Totals totals;
++    nlohmann::json pcReports = nlohmann::json::array();
++    nlohmann::json runConfig = {
++        {"standard", "HBM2"},
++        {"organization", orgFile}, {"timing", timingFile}, {"power", powerFile},
++        {"trace", traceFile}, {"variation", variationFile},
++        {"datapattern", {{"enabled", memSpec.dataPattern.enabled},
++                         {"dq_rate", memSpec.dataPattern.dq_rate},
++                         {"tsv_rate", memSpec.dataPattern.tsv_rate},
++                         {"bg_rate", memSpec.dataPattern.bg_rate}}}
++    };
+ 
+     for (const auto &[key, entries] : perPseudoChannel) {
+         auto [ch, pch] = key;
+@@ -265,6 +281,9 @@ int main(int argc, char *argv[])
+         for (std::size_t b = 0; b < bankCount; ++b) {
+             spdlog::info("  Bank {:2d} : {}", b, coreEnergy.bank_energy[b]);
+         }
++
++        pcReports.push_back(hbm_report::pseudoChannelReport(ch, pch, entries.size(), lastTime,
++            memSpec.memTimingSpec.tCK, coreEnergy, ifEnergy, dram, totals));
+     }
+ 
+     // Total average power
+@@ -275,5 +294,7 @@ int main(int argc, char *argv[])
+     spdlog::info("Elapsed cycles: {}, duration: {:.3f} ns", maxElapsedCycles, totalDuration_ps / 1e3);
+     spdlog::info("Average power: {:.3f} mW", totalPower_mW);
+ 
++    hbm_report::finish(totals, maxElapsedCycles, memSpec.memTimingSpec.tCK, pcReports, jsonOut, runConfig);
++
+     return 0;
+ }
+diff --git a/sources/drampower/src/cli/main/HBM3_runner.cpp b/sources/drampower/src/cli/main/HBM3_runner.cpp
+index 90e1ecf..152fb9b 100644
+--- a/sources/drampower/src/cli/main/HBM3_runner.cpp
++++ b/sources/drampower/src/cli/main/HBM3_runner.cpp
+@@ -14,6 +14,8 @@
+ #include <DRAMPower/memspec/MemSpecHBM3.h>
+ #include <DRAMPower/data/energy.h>
+ 
++#include "hbm_report.hpp"
++
+ #include <nlohmann/json.hpp>
+ 
+ #include <spdlog/spdlog.h>
+@@ -112,7 +114,8 @@ static json loadJson(const std::string &path)
+ // Extract optional data-pattern knob overrides (--dq-rate=, --tsv-rate=, --bg-rate=)
+ // from argv, leaving only positional arguments.
+ static void extractRateOverrides(int &argc, char *argv[],
+-        std::optional<double> &dq, std::optional<double> &tsv, std::optional<double> &bg)
++        std::optional<double> &dq, std::optional<double> &tsv, std::optional<double> &bg,
++        std::optional<std::string> &jsonOut)
+ {
+     int w = 1;
+     for (int i = 1; i < argc; ++i) {
+@@ -122,6 +125,7 @@ static void extractRateOverrides(int &argc, char *argv[],
+             if (a.rfind(pfx, 0) == 0) { dst = std::stod(a.substr(pfx.size())); return true; }
+             return false;
+         };
++        if (a.rfind("--json=", 0) == 0) { jsonOut = a.substr(7); continue; }
+         if (eat("--dq-rate", dq) || eat("--tsv-rate", tsv) || eat("--bg-rate", bg)) continue;
+         argv[w++] = argv[i];
+     }
+@@ -131,11 +135,12 @@ static void extractRateOverrides(int &argc, char *argv[],
+ int main(int argc, char *argv[])
+ {
+     std::optional<double> ovDqRate, ovTsvRate, ovBgRate;
+-    extractRateOverrides(argc, argv, ovDqRate, ovTsvRate, ovBgRate);
++    std::optional<std::string> jsonOut;
++    extractRateOverrides(argc, argv, ovDqRate, ovTsvRate, ovBgRate, jsonOut);
+ 
+     if (argc < 5 || argc > 6) {
+         spdlog::error("Usage: {} <organization.json> <timing.json> <power.json> <trace.csv> [variation.json] "
+-                      "[--dq-rate=R] [--tsv-rate=R] [--bg-rate=R]", argv[0]);
++                      "[--dq-rate=R] [--tsv-rate=R] [--bg-rate=R] [--json=out.json]", argv[0]);
+         return 1;
+     }
+ 
+@@ -233,6 +238,17 @@ int main(int argc, char *argv[])
+     // Simulate each pseudo-channel independently
+     double totalEnergy = 0.0;
+     timestamp_t maxElapsedCycles = 0;
++    hbm_report::Totals totals;
++    nlohmann::json pcReports = nlohmann::json::array();
++    nlohmann::json runConfig = {
++        {"standard", "HBM3"},
++        {"organization", orgFile}, {"timing", timingFile}, {"power", powerFile},
++        {"trace", traceFile}, {"variation", variationFile},
++        {"datapattern", {{"enabled", memSpec.dataPattern.enabled},
++                         {"dq_rate", memSpec.dataPattern.dq_rate},
++                         {"tsv_rate", memSpec.dataPattern.tsv_rate},
++                         {"bg_rate", memSpec.dataPattern.bg_rate}}}
++    };
+ 
+     for (const auto &[key, entries] : perPseudoChannel) {
+         auto [ch, pch] = key;
+@@ -267,6 +283,9 @@ int main(int argc, char *argv[])
+         for (std::size_t b = 0; b < bankCount; ++b) {
+             spdlog::info("  Bank {:2d} : {}", b, coreEnergy.bank_energy[b]);
+         }
++
++        pcReports.push_back(hbm_report::pseudoChannelReport(ch, pch, entries.size(), lastTime,
++            memSpec.memTimingSpec.tCK, coreEnergy, ifEnergy, dram, totals));
+     }
+ 
+     // Total average power
+@@ -277,5 +296,7 @@ int main(int argc, char *argv[])
+     spdlog::info("Elapsed cycles: {}, duration: {:.3f} ns", maxElapsedCycles, totalDuration_ps / 1e3);
+     spdlog::info("Average power: {:.3f} mW", totalPower_mW);
+ 
++    hbm_report::finish(totals, maxElapsedCycles, memSpec.memTimingSpec.tCK, pcReports, jsonOut, runConfig);
++
+     return 0;
+ }
+diff --git a/sources/drampower/src/cli/main/hbm_report.hpp b/sources/drampower/src/cli/main/hbm_report.hpp
+new file mode 100644
+index 0000000..f3385c2
+--- /dev/null
++++ b/sources/drampower/src/cli/main/hbm_report.hpp
+@@ -0,0 +1,183 @@
++#ifndef HBM_RUNNER_REPORT_HPP
++#define HBM_RUNNER_REPORT_HPP
++
++// Shared per-pseudo-channel reporting for HBM2_runner / HBM3_runner.
++//
++// DRAMPower's energy_t holds per-bank terms (bank_energy[b]) PLUS rank-level
++// shared terms (E_bg_act_shared, E_PDNA, E_PDNP, E_sref, E_dsm, E_refab). The
++// runners used to print only bank_energy[b], so a consumer summing the bank
++// lines silently lost the shared part. This header itemises both, checks that
++// bank_sum + shared_sum == energy_t::total(), and can dump everything as JSON.
++
++#include <cmath>
++#include <fstream>
++#include <optional>
++#include <string>
++
++#include <nlohmann/json.hpp>
++#include <spdlog/spdlog.h>
++
++#include <DRAMPower/command/CmdType.h>
++#include <DRAMPower/data/energy.h>
++
++namespace hbm_report {
++
++using json = nlohmann::json;
++
++struct Totals {
++    double energy_pJ   = 0.0;   // core + interface, all PCs
++    double bank_sum_pJ = 0.0;
++    double shared_sum_pJ = 0.0;
++    double iface_pJ    = 0.0;
++    std::size_t refa_cmds = 0;
++    double ref_pJ      = 0.0;   // sum of E_ref_AB/PB/SB/2B + E_refab
++    bool consistent    = true;
++};
++
++inline json bankToJson(std::size_t b, const DRAMPower::energy_info_t &e)
++{
++    return json{
++        {"bank", b},
++        {"E_act", e.E_act}, {"E_pre", e.E_pre},
++        {"E_bg_act", e.E_bg_act}, {"E_bg_pre", e.E_bg_pre},
++        {"E_RD", e.E_RD}, {"E_WR", e.E_WR}, {"E_RDA", e.E_RDA}, {"E_WRA", e.E_WRA},
++        {"E_pre_RDA", e.E_pre_RDA}, {"E_pre_WRA", e.E_pre_WRA},
++        {"E_ref_AB", e.E_ref_AB}, {"E_ref_PB", e.E_ref_PB},
++        {"E_ref_SB", e.E_ref_SB}, {"E_ref_2B", e.E_ref_2B},
++        {"total", e.total()}
++    };
++}
++
++inline double sharedSum(const DRAMPower::energy_t &e)
++{
++    return e.E_bg_act_shared + e.E_PDNA + e.E_PDNP + e.E_sref + e.E_dsm + e.E_refab;
++}
++
++inline json sharedToJson(const DRAMPower::energy_t &e)
++{
++    return json{
++        {"E_bg_act_shared", e.E_bg_act_shared},
++        {"E_PDNA", e.E_PDNA}, {"E_PDNP", e.E_PDNP},
++        {"E_sref", e.E_sref}, {"E_dsm", e.E_dsm}, {"E_refab", e.E_refab},
++        {"total", sharedSum(e)}
++    };
++}
++
++// Builds the per-PC JSON object, prints the one-line attribution summary and
++// accumulates into Totals. Dram must expose getBankCount()/getCommandCount().
++template <class Dram>
++inline json pseudoChannelReport(std::size_t ch, std::size_t pch, std::size_t ncmds,
++                                uint64_t elapsed_cycles, double tCK_ps,
++                                const DRAMPower::energy_t &core,
++                                const DRAMPower::interface_energy_info_t &iface,
++                                Dram &dram, Totals &tot)
++{
++    using namespace DRAMPower;
++    json banks = json::array();
++    double bank_sum = 0.0, ref_pJ = 0.0;
++    for (std::size_t b = 0; b < core.bank_energy.size(); ++b) {
++        const auto &e = core.bank_energy[b];
++        banks.push_back(bankToJson(b, e));
++        bank_sum += e.total();
++        ref_pJ += e.E_ref_AB + e.E_ref_PB + e.E_ref_SB + e.E_ref_2B;
++    }
++    const double shared_sum = sharedSum(core);
++    ref_pJ += core.E_refab;
++    const double core_total = core.total();
++    const double total = core_total + iface.total();
++    const double dur_ps = double(elapsed_cycles) * tCK_ps;
++    const double power_mW = dur_ps > 0.0 ? total / dur_ps * 1e3 : 0.0;
++
++    // Consistency: energy_t::total() must equal bank_sum + shared_sum.
++    const double rel = std::fabs((bank_sum + shared_sum) - core_total) / std::max(core_total, 1e-300);
++    const bool ok = rel <= 1e-6;
++    if (!ok) {
++        spdlog::error("!!! ENERGY ACCOUNTING MISMATCH Ch{} PCh{}: bank_sum({:.3f}) + shared_sum({:.3f}) "
++                      "!= core_total({:.3f}) (rel err {:.3e})", ch, pch, bank_sum, shared_sum, core_total, rel);
++        tot.consistent = false;
++    }
++
++    json cmds = json::object();
++    for (std::size_t i = 0; i < static_cast<std::size_t>(CmdType::COUNT); ++i) {
++        auto c = dram.getCommandCount(static_cast<CmdType>(i));
++        if (c) cmds[CmdTypeUtil::to_string(static_cast<CmdType>(i))] = c;
++    }
++    const std::size_t refa = dram.getCommandCount(CmdType::REFA);
++
++    const double bank_pct = total > 0 ? bank_sum / total * 100.0 : 0.0;
++    const double shared_pct = total > 0 ? shared_sum / total * 100.0 : 0.0;
++    spdlog::info("Channel {} PCh {} : bank-attributed {:.2f}% / shared {:.2f}% "
++                 "(bank_sum={:.3f} pJ, shared_sum={:.3f} pJ, interface={:.3f} pJ; REFA cmds={}, refresh energy={:.3f} pJ = {:.2f}%)",
++                 ch, pch, bank_pct, shared_pct, bank_sum, shared_sum, iface.total(), refa, ref_pJ,
++                 total > 0 ? ref_pJ / total * 100.0 : 0.0);
++
++    tot.energy_pJ += total;
++    tot.bank_sum_pJ += bank_sum;
++    tot.shared_sum_pJ += shared_sum;
++    tot.iface_pJ += iface.total();
++    tot.refa_cmds += refa;
++    tot.ref_pJ += ref_pJ;
++
++    return json{
++        {"channel", ch}, {"pseudochannel", pch}, {"cmds", ncmds},
++        {"cmd_counts", cmds},
++        {"elapsed_cycles", elapsed_cycles}, {"tCK_ps", tCK_ps},
++        {"duration_ns", dur_ps / 1e3},
++        {"total_energy_pJ", total}, {"core_energy_pJ", core_total},
++        {"interface_energy_pJ", iface.total()},
++        {"avg_power_mW", power_mW},
++        {"banks", banks},
++        {"shared", sharedToJson(core)},
++        {"bank_sum_pJ", bank_sum}, {"shared_sum_pJ", shared_sum},
++        {"bank_share", total > 0 ? bank_sum / total : 0.0},
++        {"shared_share", total > 0 ? shared_sum / total : 0.0},
++        {"refresh_energy_pJ", ref_pJ},
++        {"accounting_consistent", ok},
++        {"_note", "energies in pJ; bank.total follows upstream energy_info_t::total() "
++                  "(E_pre_RDA/E_pre_WRA are NOT included there). bank_sum + shared.total == core_energy_pJ."}
++    };
++}
++
++inline void finish(const Totals &tot, uint64_t maxElapsedCycles, double tCK_ps,
++                   const json &pcs, const std::optional<std::string> &jsonPath,
++                   const json &runConfig)
++{
++    const double dur_ps = double(maxElapsedCycles) * tCK_ps;
++    const double bank_pct = tot.energy_pJ > 0 ? tot.bank_sum_pJ / tot.energy_pJ * 100.0 : 0.0;
++    const double shared_pct = tot.energy_pJ > 0 ? tot.shared_sum_pJ / tot.energy_pJ * 100.0 : 0.0;
++    spdlog::info("SUMMARY: bank-attributed {:.2f}% / shared {:.2f}% of {:.3f} pJ; REFA cmds={}, refresh share={:.2f}%",
++                 bank_pct, shared_pct, tot.energy_pJ, tot.refa_cmds,
++                 tot.energy_pJ > 0 ? tot.ref_pJ / tot.energy_pJ * 100.0 : 0.0);
++    if (!tot.consistent)
++        spdlog::error("!!! ENERGY ACCOUNTING MISMATCH in at least one pseudo-channel (see above)");
++
++    if (!jsonPath) return;
++    json j;
++    j["config"] = runConfig;
++    j["pseudochannels"] = pcs;
++    j["totals"] = json{
++        {"num_pseudochannels", pcs.size()},
++        {"total_energy_pJ", tot.energy_pJ},
++        {"bank_sum_pJ", tot.bank_sum_pJ}, {"shared_sum_pJ", tot.shared_sum_pJ},
++        {"interface_energy_pJ", tot.iface_pJ},
++        {"bank_share", tot.energy_pJ > 0 ? tot.bank_sum_pJ / tot.energy_pJ : 0.0},
++        {"shared_share", tot.energy_pJ > 0 ? tot.shared_sum_pJ / tot.energy_pJ : 0.0},
++        {"refa_cmds", tot.refa_cmds},
++        {"refresh_energy_pJ", tot.ref_pJ},
++        {"max_elapsed_cycles", maxElapsedCycles},
++        {"duration_ns", dur_ps / 1e3},
++        {"avg_power_mW", dur_ps > 0 ? tot.energy_pJ / dur_ps * 1e3 : 0.0},
++        {"accounting_consistent", tot.consistent}
++    };
++    std::ofstream out(*jsonPath);
++    if (!out.is_open()) {
++        spdlog::error("Could not open --json output file: {}", *jsonPath);
++        return;
++    }
++    out << j.dump(2) << std::endl;
++    spdlog::info("Wrote JSON report: {}", *jsonPath);
++}
++
++} // namespace hbm_report
++
++#endif /* HBM_RUNNER_REPORT_HPP */

@@ -1,0 +1,6 @@
+REPEAT  4 HBM3_5.2Gbps nCCDAB 6: 2x/1x all-bank 1.1127, pbj 1.1524, pbh 1.0885
+REPEAT  4 HBM3_8.0Gbps nCCDAB 9: 2x/1x all-bank 1.1331, pbj 1.1703, pbh 1.0897
+REPEAT  8 HBM3_5.2Gbps nCCDAB 6: 2x/1x all-bank 1.1088, pbj 1.1569, pbh 1.0852
+REPEAT  8 HBM3_8.0Gbps nCCDAB 9: 2x/1x all-bank 1.1325, pbj 1.1692, pbh 1.0929
+REPEAT 16 HBM3_5.2Gbps nCCDAB 6: 2x/1x all-bank 1.1103, pbj 1.1543, pbh 1.0867
+REPEAT 16 HBM3_8.0Gbps nCCDAB 9: 2x/1x all-bank 1.1346, pbj 1.1687, pbh 1.0935

@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.DS_Store
+
+# dram/: simulator checkouts and builds (setup/), reruns of make full
+dram/external/
+dram/build/
+
+# thermal/: HotSpot build products, run cache and results
+thermal/hotspot/*.o
+thermal/hotspot/*.d
+thermal/hotspot/*.a
+thermal/hotspot/hotspot
+thermal/hotspot/hotfloorplan
+thermal/runs/
+thermal/out/

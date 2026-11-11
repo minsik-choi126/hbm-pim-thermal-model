@@ -1,0 +1,307 @@
+diff --git a/ramulator2/src/dram/impl/HBM3-PIM.cpp b/ramulator2/src/dram/impl/HBM3-PIM.cpp
+index 7b46253..bce6e40 100644
+--- a/ramulator2/src/dram/impl/HBM3-PIM.cpp
++++ b/ramulator2/src/dram/impl/HBM3-PIM.cpp
+@@ -185,6 +185,7 @@ class HBM3PIM : public IDRAM, public Implementation {
+     FuncMatrix<PreqFunc_t<Node>>    m_preqs;
+     FuncMatrix<RowhitFunc_t<Node>>  m_rowhits;
+     FuncMatrix<RowopenFunc_t<Node>> m_rowopens;
++    bool m_refsb_rrefd_pch = false;     // tRREFD per pseudo channel instead of per SID (sensitivity)
+ 
+ 
+   public:
+@@ -194,6 +195,8 @@ class HBM3PIM : public IDRAM, public Implementation {
+ 
+     void init() override {
+       RAMULATOR_DECLARE_SPECS();
++      std::string rrefd_level = param<std::string>("refsb_rrefd_level").desc("rank (SID) or pseudochannel").default_val("rank");
++      m_refsb_rrefd_pch = (rrefd_level == "pseudochannel");
+       set_organization();
+       set_timing_vals();
+ 
+@@ -377,6 +380,19 @@ class HBM3PIM : public IDRAM, public Implementation {
+           {.level = "channel", .preceding = {"ACTAB"}, .following = {"PREA"}, .latency = V("nRAS")},  
+           {.level = "channel", .preceding = {"MACAB"},  .following = {"PREA"}, .latency = V("nRTPL")},  
+           {.level = "channel", .preceding = {"PREA"}, .following = {"ACTAB"}, .latency = V("nRP")},  
++          // Per-bank refresh with all-bank PIM (PerBankHBM3): ACTAB re-opens every bank of the channel, so it must wait
++          // until a bank being refreshed by REFsb is done; the PREA that closes the channel before REFsb needs tRP;
++          // single-bank PRE after an all-bank command keeps the all-bank tRTP/tRAS.
++          {.level = "channel", .preceding = {"REFsb"}, .following = {"ACTAB", "ACTSB", "ACTPB"}, .latency = V("nRFCSB")},
++          // REFab is a channel-scope command, so the pseudo-channel rules ending in REFab are never checked: the
++          // activates that re-open the channel wait tRFC at channel level (else one pseudo channel is still refreshing)
++          {.level = "channel", .preceding = {"REFab"}, .following = {"ACTAB", "ACTSB", "ACTPB"}, .latency = V("nRFC")},
++          {.level = "channel", .preceding = {"PREA"}, .following = {"REFsb"}, .latency = V("nRP")},
++          // and REFab waits tRP after PREA at channel level (the original pseudo-channel rule never fired: REFab came
++          // 1 cycle after PREA)
++          {.level = "channel", .preceding = {"PREA"}, .following = {"REFab"}, .latency = V("nRP")},
++          {.level = "channel", .preceding = {"MACAB"}, .following = {"PRE"}, .latency = V("nRTPL")},
++          {.level = "channel", .preceding = {"ACTAB"}, .following = {"PRE"}, .latency = V("nRAS")},
+           /// RAS <-> REF
+           {.level = "pseudochannel", .preceding = {"ACTAB"}, .following = {"REFab"}, .latency = V("nRC")},          
+           {.level = "pseudochannel", .preceding = {"PREA"}, .following = {"REFab"}, .latency = V("nRP")},          
+@@ -495,11 +511,22 @@ class HBM3PIM : public IDRAM, public Implementation {
+           {.level = "bank", .preceding = {"ACT"}, .following = {"RD"}, .latency = V("nRCDRD")},  
+           {.level = "bank", .preceding = {"ACT"}, .following = {"WR"}, .latency = V("nRCDWR")},  
+           {.level = "bank", .preceding = {"ACT"}, .following = {"PRE"}, .latency = V("nRAS")},  
++          // Per-bank refresh: the refreshed bank cannot be activated or refreshed again for tRFCsb; REFsb after PRE needs tRP
++          {.level = "bank", .preceding = {"REFsb"}, .following = {"ACT", "REFsb"}, .latency = V("nRFCSB")},
++          {.level = "bank", .preceding = {"PRE"}, .following = {"REFsb"}, .latency = V("nRP")},
+           {.level = "bank", .preceding = {"PRE"}, .following = {"ACT"}, .latency = V("nRP")},  
+           {.level = "bank", .preceding = {"RD"},  .following = {"PRE"}, .latency = V("nRTPL")},  
+           {.level = "bank", .preceding = {"WR"},  .following = {"PRE"}, .latency = V("nCWL") + V("nBL") + V("nWR")},  
+         }
+       );
++      // Sensitivity (PerBankHBM3): tRREFD between REFsb to different banks counted per pseudo channel (as the HBM2 model
++      // does) instead of per SID; set "refsb_rrefd_level: pseudochannel" in the DRAM config
++      if (m_refsb_rrefd_pch) {
++        populate_timingcons(this, {
++          {.level = "pseudochannel", .preceding = {"REFsb"}, .following = {"REFsb"}, .latency = V("nRREFD")},
++          {.level = "pseudochannel", .preceding = {"REFsb"}, .following = {"ACT"}, .latency = V("nRREFD") - 1},
++        });
++      }
+       #undef V
+ 
+     };
+@@ -537,6 +564,9 @@ class HBM3PIM : public IDRAM, public Implementation {
+ 
+       // Pseudo Channel Preqs
+       m_preqs[m_levels["channel"]][m_commands["REFab"]] = Lambdas::Preq::Channel::RequireAllBanksClosed<HBM3PIM>;
++      // REFsb closes the channel first, as REFab does: with all-bank PIM the channel must be re-opened by ACTAB after
++      // any per-bank refresh anyway, so one PREA replaces one PRE per refreshed bank (PerBankHBM3)
++      m_preqs[m_levels["channel"]][m_commands["REFsb"]] = Lambdas::Preq::Channel::RequireAllBanksClosed<HBM3PIM>;
+ 
+       // Bank Preqs
+       m_preqs[m_levels["bank"]][m_commands["REFsb"]] = Lambdas::Preq::Bank::RequireBankClosed<HBM3PIM>;
+diff --git a/ramulator2/src/dram_controller/CMakeLists.txt b/ramulator2/src/dram_controller/CMakeLists.txt
+index fbc2866..e94d6b1 100644
+--- a/ramulator2/src/dram_controller/CMakeLists.txt
++++ b/ramulator2/src/dram_controller/CMakeLists.txt
+@@ -1,32 +1,33 @@
+-add_library(ramulator-controller OBJECT)
+-
+-target_sources(
+-  ramulator-controller PRIVATE
+-  controller.h 
+-  scheduler.h 
+-  plugin.h
+-  refresh.h
+-
+-  impl/dummy_controller.cpp
+-  impl/generic_dram_controller.cpp
++add_library(ramulator-controller OBJECT)
++
++target_sources(
++  ramulator-controller PRIVATE
++  controller.h 
++  scheduler.h 
++  plugin.h
++  refresh.h
++
++  impl/dummy_controller.cpp
++  impl/generic_dram_controller.cpp
+   impl/hbm3_controller.cpp
+   impl/hbm3_pim_controller.cpp
+-  
+-  impl/scheduler/generic_scheduler.cpp
++  
++  impl/scheduler/generic_scheduler.cpp
+   impl/scheduler/pim_scheduler.cpp
+-
+-  impl/refresh/all_bank_refresh.cpp
++
++  impl/refresh/all_bank_refresh.cpp
+   impl/refresh/all_bank_refresh_hbm3.cpp
++  impl/refresh/per_bank_refresh_hbm3.cpp
+   impl/refresh/no_refresh.cpp
+-
++
+   impl/plugin/hbm3_trace_recorder.cpp
+-  impl/plugin/trace_recorder.cpp
+-  impl/plugin/cmd_counter.cpp
+-
+-  )
+-
+-target_link_libraries(
+-  ramulator
+-  PRIVATE
+-  ramulator-controller
++  impl/plugin/trace_recorder.cpp
++  impl/plugin/cmd_counter.cpp
++
++  )
++
++target_link_libraries(
++  ramulator
++  PRIVATE
++  ramulator-controller
+ )
+\ No newline at end of file
+diff --git a/ramulator2/src/dram_controller/impl/hbm3_pim_controller.cpp b/ramulator2/src/dram_controller/impl/hbm3_pim_controller.cpp
+index 7bec09e..1bf27fc 100644
+--- a/ramulator2/src/dram_controller/impl/hbm3_pim_controller.cpp
++++ b/ramulator2/src/dram_controller/impl/hbm3_pim_controller.cpp
+@@ -114,6 +114,9 @@ class HBM3PIMController final : public IDRAMController, public Implementation {
+       ReqBuffer::iterator req_it;
+       ReqBuffer* buffer = nullptr;
+       bool request_found = schedule_request(req_it, buffer);
++      // The command issued first this cycle, saved before the request may be removed from its buffer below
++      // (the second-issue path used to read it through the stale iterator; nothing issued -> no second issue)
++      int first_command = request_found ? req_it->command : -1;
+ 
+       // 3. Update all plugins
+       for (auto plugin : m_plugins) {
+@@ -148,7 +151,9 @@ class HBM3PIMController final : public IDRAMController, public Implementation {
+       ReqBuffer::iterator sec_req_it;
+       ReqBuffer* sec_buffer = nullptr;
+       bool sec_request_found = false;
+-      sec_request_found = schedule_sec_request(sec_req_it, buffer, req_it->command);
++      if (first_command >= 0) {
++        sec_request_found = schedule_sec_request(sec_req_it, buffer, first_command);
++      }
+       for (auto plugin : m_plugins) {
+         plugin->update(sec_request_found, sec_req_it);
+       }
+@@ -250,6 +255,18 @@ class HBM3PIMController final : public IDRAMController, public Implementation {
+           
+           request_found = m_dram->check_ready(req_it->command, req_it->addr_vec);
+           if (!request_found & m_priority_buffer.size() != 0) {
++            // A refresh is waiting (e.g. its PREA for tRTP after the last MAC). Policy: let PIM commands that need no
++            // row change (row hits, command == final command) finish the open row first; anything that would close or
++            // open rows waits for the refresh. (Before, this happened only through a stale iterator in the second-issue
++            // path; now it is explicit and limited to the open row.)
++            auto pim_it = m_scheduler->get_best_request(m_pim_buffer);
++            if (pim_it != m_pim_buffer.end() && pim_it->command == pim_it->final_command &&
++                m_dram->check_ready(pim_it->command, pim_it->addr_vec)) {
++              req_it = pim_it;
++              req_buffer = &m_pim_buffer;
++              is_pim = true;
++              return true;
++            }
+             return false;
+           }
+         }
+diff --git a/ramulator2/src/dram_controller/impl/refresh/per_bank_refresh_hbm3.cpp b/ramulator2/src/dram_controller/impl/refresh/per_bank_refresh_hbm3.cpp
+new file mode 100644
+index 0000000..967f7d0
+--- /dev/null
++++ b/ramulator2/src/dram_controller/impl/refresh/per_bank_refresh_hbm3.cpp
+@@ -0,0 +1,119 @@
++#include <vector>
++
++#include "base/base.h"
++#include "dram_controller/controller.h"
++#include "dram_controller/refresh.h"
++
++namespace Ramulator {
++
++// Per-bank (same-bank) refresh for HBM3: every bank of every pseudo channel gets one REFsb per tREFI.
++//   policy "batched": at each tREFI, REFsb to all banks of each pseudo channel back to back, alternating SIDs
++//                     (a PIM-aware controller that groups the per-bank refreshes; best case for all-bank PIM)
++//   policy "spread":  REFsb to one bank of each pseudo channel every tREFI / (banks per pseudo channel),
++//                     round-robin (the usual per-bank refresh schedule)
++// tREFI comes from nREFI (a 2x refresh run halves it); the per-bank interval is computed here as
++// nREFI / banks instead of the preset nREFISB, whose stack-height lookup is indexed by the SID count.
++// tRFCsb is nRFCSB (HBM3-PIM presets: 260 / 320 cycles = 200 ns, independent of density; override it in the config).
++// "spread" with nRFCSB >= the per-bank interval never lets an all-bank PIM ACTAB through, so it is refused.
++class PerBankRefreshHBM3 : public IRefreshManager, public Implementation {
++  RAMULATOR_REGISTER_IMPLEMENTATION(IRefreshManager, PerBankRefreshHBM3, "PerBankHBM3", "Per-bank refresh scheme for HBM3.")
++  private:
++    Clk_t m_clk = 0;
++    IDRAM* m_dram;
++    IDRAMController* m_ctrl;
++
++    std::string m_policy;
++    int m_dram_org_levels = -1;
++    int m_num_pch = -1;
++    int m_num_ranks = -1;
++    int m_num_bgs = -1;
++    int m_num_banks = -1;
++    int m_banks_per_pch = -1;
++
++    int m_nrefi = -1;
++    int m_interval = -1;
++    int m_ref_req_id = -1;
++    Clk_t m_next_refresh_cycle = -1;
++    int m_next_bank = 0;           // spread: flat bank index (rank, bg, bank) refreshed next in every pseudo channel
++
++    int m_lv_pch = -1, m_lv_rank = -1, m_lv_bg = -1, m_lv_bank = -1;
++
++    void send(int pch, int flat) {
++      std::vector<int> addr_vec(m_dram_org_levels, -1);
++      addr_vec[0] = m_ctrl->m_channel_id;
++      addr_vec[m_lv_pch] = pch;
++      addr_vec[m_lv_rank] = flat / (m_num_bgs * m_num_banks);
++      addr_vec[m_lv_bg] = (flat / m_num_banks) % m_num_bgs;
++      addr_vec[m_lv_bank] = flat % m_num_banks;
++      Request req(addr_vec, m_ref_req_id);
++      if (!m_ctrl->priority_send(req)) {
++        throw std::runtime_error("Failed to send per-bank refresh!");
++      }
++    }
++
++  public:
++    void init() override {
++      m_ctrl = cast_parent<IDRAMController>();
++      m_policy = param<std::string>("policy").desc("batched or spread").default_val("batched");
++      if (m_policy != "batched" && m_policy != "spread") {
++        throw ConfigurationError("PerBankHBM3: policy must be batched or spread, got {}", m_policy);
++      }
++    };
++
++    void setup(IFrontEnd* frontend, IMemorySystem* memory_system) override {
++      m_dram = m_ctrl->m_dram;
++
++      m_dram_org_levels = m_dram->m_levels.size();
++      m_lv_pch = m_dram->m_levels("pseudochannel");
++      m_lv_rank = m_dram->m_levels("rank");
++      m_lv_bg = m_dram->m_levels("bankgroup");
++      m_lv_bank = m_dram->m_levels("bank");
++      m_num_pch = m_dram->get_level_size("pseudochannel");
++      m_num_ranks = m_dram->get_level_size("rank");
++      m_num_bgs = m_dram->get_level_size("bankgroup");
++      m_num_banks = m_dram->get_level_size("bank");
++      m_banks_per_pch = m_num_ranks * m_num_bgs * m_num_banks;
++
++      m_nrefi = m_dram->m_timing_vals("nREFI");
++      if (m_dram->m_timing_vals("nRFCSB") <= 0) {
++        throw ConfigurationError("PerBankHBM3: nRFCSB must be positive");
++      }
++      m_interval = (m_policy == "batched") ? m_nrefi : m_nrefi / m_banks_per_pch;
++      if (m_interval <= 0) {
++        throw ConfigurationError("PerBankHBM3: refresh interval {} cycles", m_interval);
++      }
++      if (m_policy == "spread" && m_dram->m_timing_vals("nRFCSB") >= m_interval) {
++        throw ConfigurationError("PerBankHBM3: spread schedule starves all-bank PIM (nRFCSB {} >= interval {})",
++                                 m_dram->m_timing_vals("nRFCSB"), m_interval);
++      }
++      m_ref_req_id = m_dram->m_requests("per-bank-refresh");
++      m_next_refresh_cycle = m_interval;
++    };
++
++    void tick() {
++      m_clk++;
++
++      if (m_clk == m_next_refresh_cycle) {
++        m_next_refresh_cycle += m_interval;
++        if (m_policy == "batched") {
++          // tRREFD spaces REFsb within a rank (SID): alternate SIDs and pseudo channels so the batch overlaps
++          int per_rank = m_num_bgs * m_num_banks;
++          for (int i = 0; i < per_rank; i++) {
++            for (int r = 0; r < m_num_ranks; r++) {
++              for (int pch = 0; pch < m_num_pch; pch++) {
++                send(pch, r * per_rank + i);
++              }
++            }
++          }
++        } else {
++          for (int pch = 0; pch < m_num_pch; pch++) {
++            send(pch, m_next_bank);
++          }
++          m_next_bank = (m_next_bank + 1) % m_banks_per_pch;
++        }
++      }
++    };
++
++};
++
++}       // namespace Ramulator

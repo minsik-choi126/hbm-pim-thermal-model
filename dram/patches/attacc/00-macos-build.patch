@@ -1,0 +1,29 @@
+diff --git a/ramulator2/CMakeLists.txt b/ramulator2/CMakeLists.txt
+index 94a917b..587b76d 100644
+--- a/ramulator2/CMakeLists.txt
++++ b/ramulator2/CMakeLists.txt
+@@ -23,6 +23,11 @@ set(CMAKE_CXX_STANDARD 20)
+ set(CMAKE_CXX_STANDARD_REQUIRED True)
+ set(CMAKE_CXX_EXTENSIONS OFF)
+ 
++# Apple clang rejects the consteval FMT_STRING checker of the fmt bundled in spdlog 1.11.0.
++if(APPLE)
++  add_compile_definitions(FMT_CONSTEVAL=)
++endif()
++
+ #### External libraries ####
+ include(FetchContent)
+ set(FETCHCONTENT_UPDATES_DISCONNECTED ON CACHE BOOL "Skip updating the external dependencies after populating them for the first time")
+diff --git a/ramulator2/src/base/param.h b/ramulator2/src/base/param.h
+index c626ee4..6df87a2 100644
+--- a/ramulator2/src/base/param.h
++++ b/ramulator2/src/base/param.h
+@@ -88,7 +88,7 @@ class _ParamChainer {
+ 
+       if (_config[_name]) {
+         try {
+-          return _config[_name].as<T>();
++          return _config[_name].template as<T>();
+         } catch (const YAML::BadConversion& e) {
+           throw ConfigurationError("Failed to parse Param \"{}\" for implementation \"{}\".", _name_prefix + _name, _impl_name);
+         }

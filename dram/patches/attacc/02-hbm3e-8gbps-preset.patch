@@ -1,0 +1,18 @@
+diff --git a/ramulator2/src/dram/impl/HBM3-PIM.cpp b/ramulator2/src/dram/impl/HBM3-PIM.cpp
+index bce6e40..4c81d9b 100644
+--- a/ramulator2/src/dram/impl/HBM3-PIM.cpp
++++ b/ramulator2/src/dram/impl/HBM3-PIM.cpp
+@@ -40,6 +40,13 @@ class HBM3PIM : public IDRAM, public Implementation {
+       {"HBM3_6.0Gbps_NPC", {6000,   2,  21,   21,     21,    21,   51,  72,  24,    6,     9,    6,    2,      4,     4,      4,      2,     4,     9,    12,    3,    45,   -1,   300,   5850,     -1,     12,   1500}},
+       {"HBM3_6.4Gbps",     {6400,   2,  23,   23,     23,    23,   55,  77,  26,    7,    10,    7,    2,      4,     7,      8,      2,     4,    10,    13,    3,    48,   -1,   320,   6240,     -1,     13,   1600}},
+       {"HBM3_6.4Gbps_NPC", {6400,   2,  23,   23,     23,    23,   55,  77,  26,    7,    10,    7,    2,      4,     4,      4,      2,     4,    10,    13,    3,    48,   -1,   320,   6240,     -1,     13,   1600}},
++      // HBM3E 8.0 Gbps (added for B200): the same absolute values as the presets above (tCL/tRCD/tRP 14, tRAS 34,
++      // tRC 48, tWR 16, tRTPS 4, tRTPL 6, tCWL 4, tWTRS 6, tWTRL 8, tFAW 30, tRREFD 8, tRFCsb 200 ns, tREFI 3.9 us) at
++      // tCK 0.5 ns; nCCDL 5: JESD238B.01 Table 93 sets tCCDL >= max(4 nCK, 2.5 ns), which is 5 CK at tCK 0.5 ns (4 CK at
++      // 4.8-6.4 Gbps); nCCDAB 9 / nCCDSB 10 (4.5 / 5 ns): the shortest not faster than the 6.4 Gbps preset (4.375 / 5 ns);
++      // _NPC: nCCDAB / nCCDSB 5, the tCCDL floor (the 4 of the other _NPC rows would be 2.0 ns here).
++      {"HBM3_8.0Gbps",     {8000,   2,  28,   28,     28,    28,   68,  96,  32,    8,    12,    8,    2,      5,     9,     10,      2,     4,    12,    16,    3,    60,   -1,   400,   7800,     -1,     16,   2000}},
++      {"HBM3_8.0Gbps_NPC", {8000,   2,  28,   28,     28,    28,   68,  96,  32,    8,    12,    8,    2,      5,     5,      5,      2,     4,    12,    16,    3,    60,   -1,   400,   7800,     -1,     16,   2000}},
+       // TODO: Find more sources on HBM3 timings... 
+       // We could not find released HBM3 timing parameters. So, we mostly refer to the absolute value (ns) of the HBM2 timing parameters in DRAMSim3 (https://github.com/umd-memsys/DRAMsim3/blob/master/configs/HBM2_8Gb_x128.ini, commit: 29817593b3389f1337235d63cac515024ab8fd6e)
+       // nCCDAB/nCCDSB/nCCDPB is minimum delay between consecutive MACABs/MACSBs considering power constraint.

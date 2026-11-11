@@ -1,0 +1,285 @@
+{
+ "op": {
+  "P_G": 332.70658,
+  "P_M": 80.09513,
+  "dM": 20.0,
+  "P_P": 52.10113,
+  "at_e": 1.83551,
+  "src": "abs_threshold.point(H100, e_x, timing)"
+ },
+ "grid": 64,
+ "binary": "original",
+ "cell_mm": 0.71141,
+ "x0": {
+  "location": {
+   "gpu_only": {
+    "rise_K": 10.63996,
+    "stack": 1,
+    "die_from_bottom": 1,
+    "x_mm": 7.46977,
+    "y_mm": 18.5707,
+    "to_gpu_edge_mm": 0.53023,
+    "to_chip_boundary_mm": 7.46977,
+    "base_die_max_in_stacks_K": 10.81962,
+    "interior_max_K": 10.63996,
+    "gpu_half_max_K": 10.63996,
+    "per_die_max_K": [
+     10.63996,
+     10.48026,
+     10.32389,
+     10.16419,
+     9.99783,
+     9.8215,
+     9.63851,
+     9.45552
+    ]
+   },
+   "gpu_mem": {
+    "rise_K": 22.32494,
+    "stack": 1,
+    "die_from_bottom": 1,
+    "x_mm": 3.91273,
+    "y_mm": 17.9993,
+    "to_gpu_edge_mm": 4.08727,
+    "to_chip_boundary_mm": 3.91273,
+    "base_die_max_in_stacks_K": 22.27744,
+    "interior_max_K": 22.32494,
+    "gpu_half_max_K": 22.27535,
+    "per_die_max_K": [
+     22.32494,
+     21.95854,
+     21.20608,
+     20.07428,
+     18.60336,
+     16.86746,
+     15.00168,
+     12.83634
+    ]
+   },
+   "gpu_mem_pim": {
+    "rise_K": 32.93838,
+    "stack": 1,
+    "die_from_bottom": 1,
+    "x_mm": 0.3557,
+    "y_mm": 17.42789,
+    "to_gpu_edge_mm": 7.6443,
+    "to_chip_boundary_mm": 0.3557,
+    "base_die_max_in_stacks_K": 32.78057,
+    "interior_max_K": 32.75,
+    "gpu_half_max_K": 30.45176,
+    "per_die_max_K": [
+     32.93838,
+     32.29802,
+     30.87259,
+     28.65846,
+     25.6517,
+     22.3332,
+     18.84722,
+     15.12315
+    ]
+   },
+   "pim_alone": {
+    "rise_K": 11.31043,
+    "stack": 2,
+    "die_from_bottom": 1,
+    "x_mm": 0.3557,
+    "y_mm": 36.2843,
+    "to_gpu_edge_mm": 7.6443,
+    "to_chip_boundary_mm": 0.2857,
+    "base_die_max_in_stacks_K": 11.10464,
+    "interior_max_K": 10.79092,
+    "gpu_half_max_K": 9.41889,
+    "per_die_max_K": [
+     11.31043,
+     11.14138,
+     10.60832,
+     9.71465,
+     8.45482,
+     6.81679,
+     4.77968,
+     2.4376
+    ]
+   },
+   "mem_alone": {
+    "rise_K": 15.3222,
+    "stack": 1,
+    "die_from_bottom": 1,
+    "x_mm": 0.3557,
+    "y_mm": 17.9993,
+    "to_gpu_edge_mm": 7.6443,
+    "to_chip_boundary_mm": 0.3557,
+    "base_die_max_in_stacks_K": 15.29417,
+    "interior_max_K": 15.27975,
+    "gpu_half_max_K": 14.40431,
+    "per_die_max_K": [
+     15.3222,
+     14.92573,
+     14.10315,
+     12.85126,
+     11.16686,
+     9.05876,
+     6.5662,
+     3.71721
+    ]
+   }
+  },
+  "beta": {
+   "cell": {
+    "beta": 1.12818,
+    "T0": 22.32494
+   },
+   "interior": {
+    "beta": 1.10816,
+    "T0": 22.32494
+   },
+   "gpu_half": {
+    "beta": 0.89732,
+    "T0": 22.27535
+   },
+   "far_half": {
+    "beta": 1.11752,
+    "T0": 22.32494
+   },
+   "base_die_max": {
+    "beta": 1.11342,
+    "T0": 22.27744
+   }
+  }
+ },
+ "best": {
+  "location": {
+   "gpu_only": {
+    "rise_K": 10.01447,
+    "stack": 1,
+    "die_from_bottom": 1,
+    "x_mm": 7.46977,
+    "y_mm": 18.5707,
+    "to_gpu_edge_mm": 0.53023,
+    "to_chip_boundary_mm": 7.46977,
+    "base_die_max_in_stacks_K": 10.1409,
+    "interior_max_K": 10.01447,
+    "gpu_half_max_K": 10.01447,
+    "per_die_max_K": [
+     10.01447,
+     9.89802,
+     9.78157,
+     9.6618,
+     9.5387,
+     9.40894,
+     9.27919,
+     9.1461
+    ]
+   },
+   "gpu_mem": {
+    "rise_K": 22.41039,
+    "stack": 1,
+    "die_from_bottom": 1,
+    "x_mm": 4.62414,
+    "y_mm": 17.9993,
+    "to_gpu_edge_mm": 3.37586,
+    "to_chip_boundary_mm": 4.62414,
+    "base_die_max_in_stacks_K": 24.0939,
+    "interior_max_K": 22.41039,
+    "gpu_half_max_K": 22.41039,
+    "per_die_max_K": [
+     22.41039,
+     20.76561,
+     19.14837,
+     17.56424,
+     16.06175,
+     14.76623,
+     13.55571,
+     12.32743
+    ]
+   },
+   "gpu_mem_pim": {
+    "rise_K": 28.66545,
+    "stack": 1,
+    "die_from_bottom": 1,
+    "x_mm": 0.3557,
+    "y_mm": 17.42789,
+    "to_gpu_edge_mm": 7.6443,
+    "to_chip_boundary_mm": 0.3557,
+    "base_die_max_in_stacks_K": 30.32527,
+    "interior_max_K": 28.58069,
+    "gpu_half_max_K": 28.01331,
+    "per_die_max_K": [
+     28.66545,
+     26.80266,
+     24.73553,
+     22.7968,
+     20.82294,
+     18.71281,
+     16.65544,
+     14.583
+    ]
+   },
+   "pim_alone": {
+    "rise_K": 7.26462,
+    "stack": 2,
+    "die_from_bottom": 1,
+    "x_mm": 0.3557,
+    "y_mm": 36.2843,
+    "to_gpu_edge_mm": 7.6443,
+    "to_chip_boundary_mm": 0.2857,
+    "base_die_max_in_stacks_K": 7.17111,
+    "interior_max_K": 6.90614,
+    "gpu_half_max_K": 6.18538,
+    "per_die_max_K": [
+     7.26462,
+     7.1593,
+     6.8581,
+     6.3605,
+     5.6645,
+     4.76465,
+     3.66699,
+     2.43582
+    ]
+   },
+   "mem_alone": {
+    "rise_K": 15.55783,
+    "stack": 1,
+    "die_from_bottom": 1,
+    "x_mm": 0.3557,
+    "y_mm": 17.9993,
+    "to_gpu_edge_mm": 7.6443,
+    "to_chip_boundary_mm": 0.3557,
+    "base_die_max_in_stacks_K": 17.27135,
+    "interior_max_K": 15.54609,
+    "gpu_half_max_K": 14.81216,
+    "per_die_max_K": [
+     15.55783,
+     13.84038,
+     12.11823,
+     10.39556,
+     8.67952,
+     6.9724,
+     5.28041,
+     3.61775
+    ]
+   }
+  },
+  "beta": {
+   "cell": {
+    "beta": 0.65916,
+    "T0": 22.41039
+   },
+   "interior": {
+    "beta": 0.65023,
+    "T0": 22.41039
+   },
+   "gpu_half": {
+    "beta": 0.59044,
+    "T0": 22.41039
+   },
+   "far_half": {
+    "beta": 0.64537,
+    "T0": 22.31453
+   },
+   "base_die_max": {
+    "beta": 0.58809,
+    "T0": 24.0939
+   }
+  }
+ }
+}

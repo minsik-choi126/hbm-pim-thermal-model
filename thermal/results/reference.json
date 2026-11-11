@@ -1,0 +1,1079 @@
+{
+ "note": "Expected values per mode. paper: the value as reported ('' = not reported; 'ref only' = reference value not used in the reported results). quick: what this repository computes (grid 64 for the bank model, 30 ms ripple window, recalibration over k = 0.75-2.0, which holds every interpolation row the recalibrated values use, so recal values equal full). full: the values behind the paper, from the analysis repository (bank values there come from direct 40 W runs; the unit-response superposition here differs by up to about 1e-3; the grid-128 bank step run here gives f_bank 1.1145 against 1.1146). Tolerances absolute. beta values follow the one definition of thermal/model/beta.py; full beta values from the analysis repository's definition test (direct runs at x = 0 and the recalibration family; direct runs here agree to 1e-5). Entries marked comparison hold the f_bank and local-slope normalisations, which the manuscript does not print.",
+ "values": [
+  {
+   "id": "measured.h100_fit.s_host",
+   "what": "HBM rise per non-memory W (K/W)",
+   "paper": "0.0226",
+   "full": 0.022590630325674634,
+   "quick": 0.022590630325674634,
+   "tol": {
+    "full": 1e-09,
+    "quick": 1e-09
+   }
+  },
+  {
+   "id": "measured.h100_fit.s_rail",
+   "what": "HBM rise per memory W (K/W)",
+   "paper": "0.1877",
+   "full": 0.18773950133809075,
+   "quick": 0.18773950133809075,
+   "tol": {
+    "full": 1e-09,
+    "quick": 1e-09
+   }
+  },
+  {
+   "id": "measured.h100_fit.s_rail_ci[0]",
+   "what": "  95 % CI low",
+   "paper": "",
+   "full": 0.16791395642028487,
+   "quick": 0.16791395642028487,
+   "tol": {
+    "full": 1e-09,
+    "quick": 1e-09
+   }
+  },
+  {
+   "id": "measured.h100_fit.s_rail_ci[1]",
+   "what": "  95 % CI high",
+   "paper": "",
+   "full": 0.20631802684077533,
+   "quick": 0.20631802684077533,
+   "tol": {
+    "full": 1e-09,
+    "quick": 1e-09
+   }
+  },
+  {
+   "id": "measured.anchor.hbm_per_board_W",
+   "what": "calibration target, HBM rise per board W",
+   "paper": "",
+   "full": 0.04327825991559403,
+   "quick": 0.04327825991559403,
+   "tol": {
+    "full": 1e-12,
+    "quick": 1e-12
+   }
+  },
+  {
+   "id": "measured.anchor.mem_per_board_W",
+   "what": "memory W per board W (GEMM sweep)",
+   "paper": "",
+   "full": 0.1175497469012418,
+   "quick": 0.1175497469012418,
+   "tol": {
+    "full": 1e-12,
+    "quick": 1e-12
+   }
+  },
+  {
+   "id": "measured.rowmiss.ratio",
+   "what": "row-miss heating ratio (measured)",
+   "paper": "0.70",
+   "full": 0.7010862129750653,
+   "quick": 0.7010862129750653,
+   "tol": {
+    "full": 1e-09,
+    "quick": 1e-09
+   }
+  },
+  {
+   "id": "measured.rowmiss.ratio_ci95[0]",
+   "what": "  95 % CI low",
+   "paper": "0.63",
+   "full": 0.6332029134293921,
+   "quick": 0.6332029134293921,
+   "tol": {
+    "full": 1e-09,
+    "quick": 1e-09
+   }
+  },
+  {
+   "id": "measured.rowmiss.ratio_ci95[1]",
+   "what": "  95 % CI high",
+   "paper": "0.78",
+   "full": 0.7785098081631804,
+   "quick": 0.7785098081631804,
+   "tol": {
+    "full": 1e-09,
+    "quick": 1e-09
+   }
+  },
+  {
+   "id": "smoke.dram_peak_C",
+   "what": "smoke run: hottest DRAM block (degC)",
+   "paper": "",
+   "full": 74.5,
+   "tol": {
+    "full": 0.02,
+    "quick": 0.02
+   }
+  },
+  {
+   "id": "smoke.gpu_die_C",
+   "what": "smoke run: GPU die (degC)",
+   "paper": "",
+   "full": 57.879999999999995,
+   "tol": {
+    "full": 0.02,
+    "quick": 0.02
+   }
+  },
+  {
+   "id": "calibrate.k.k1.r_convec",
+   "what": "heat-sink resistance r_convec (K/W), k = 1",
+   "paper": "",
+   "full": 0.01361,
+   "quick": 0.01361,
+   "tol": {
+    "full": 1e-09,
+    "quick": 1e-09
+   }
+  },
+  {
+   "id": "calibrate.k.k1.slope_check",
+   "what": "model HBM rise per board W at r_convec",
+   "paper": "",
+   "full": 0.04322500000000005,
+   "quick": 0.04322500000000005,
+   "tol": {
+    "full": 1e-06,
+    "quick": 1e-06
+   }
+  },
+  {
+   "id": "calibrate.k.k1.pim_peak_per_w_per_stack",
+   "what": "uniform PIM, HBM rise per W per stack",
+   "paper": "",
+   "full": 0.9299999999999997,
+   "quick": 0.9299999999999997,
+   "tol": {
+    "full": 1e-06,
+    "quick": 1e-06
+   }
+  },
+  {
+   "id": "bank.summary.f_bank",
+   "what": "comparison: f_bank, every bank (k = 1, fixed base point)",
+   "paper": "",
+   "full": 1.1146,
+   "quick": 1.1204582459027388,
+   "tol": {
+    "full": 0.002,
+    "quick": 0.001
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "bank.summary.f_bank_range[0]",
+   "what": "  range low",
+   "paper": "",
+   "full": 1.0251,
+   "quick": 1.0233632742329335,
+   "tol": {
+    "full": 0.002,
+    "quick": 0.001
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "bank.summary.f_bank_range[1]",
+   "what": "  range high",
+   "paper": "",
+   "full": 1.1513,
+   "quick": 1.15475215070602,
+   "tol": {
+    "full": 0.002,
+    "quick": 0.001
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "bank.summary.half[0]",
+   "what": "comparison: f_bank, half of the channels, low",
+   "paper": "",
+   "full": 1.502,
+   "quick": 1.5058383007750291,
+   "tol": {
+    "full": 0.003,
+    "quick": 0.001
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "bank.summary.half[1]",
+   "what": "  high",
+   "paper": "",
+   "full": 1.852,
+   "quick": 1.865377529992568,
+   "tol": {
+    "full": 0.003,
+    "quick": 0.001
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "bank.summary.quarter[0]",
+   "what": "comparison: f_bank, quarter of the channels, low",
+   "paper": "",
+   "full": 1.745,
+   "quick": 1.7493354873128775,
+   "tol": {
+    "full": 0.003,
+    "quick": 0.001
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "bank.summary.quarter[1]",
+   "what": "  high",
+   "paper": "",
+   "full": 3.0425,
+   "quick": 3.0491547154687333,
+   "tol": {
+    "full": 0.003,
+    "quick": 0.001
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "bank.summary.quarter_block_cell",
+   "what": "comparison: f_bank, PIM in one quarter of each die",
+   "paper": "",
+   "full": 2.7406,
+   "quick": 2.7446433379339634,
+   "tol": {
+    "full": 0.003,
+    "quick": 0.001
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "bank.summary.base_die_over_dram",
+   "what": "base-die W over DRAM-die W (peak DRAM rise)",
+   "paper": "1.7",
+   "full": 1.7419,
+   "quick": 1.7417560250557378,
+   "tol": {
+    "full": 0.002,
+    "quick": 0.001
+   }
+  },
+  {
+   "id": "bank.ripple.summary.per_layer_max_above_avg",
+   "what": "ripple, per-layer PIM bursts (K above step average)",
+   "paper": "0.06 (<= 0.1)",
+   "full": 0.0549,
+   "quick": 0.05501934732291147,
+   "tol": {
+    "full": 0.0002,
+    "quick": 0.0002
+   }
+  },
+  {
+   "id": "bank.ripple.summary.per_layer_plus_burst_max",
+   "what": "  plus adiabatic swing within a burst (K)",
+   "paper": "0.14",
+   "full": 0.1356,
+   "quick": 0.13569311580294738,
+   "tol": {
+    "full": 0.0002,
+    "quick": 0.0002
+   }
+  },
+  {
+   "id": "bank.ripple.summary.lump_max_above_avg",
+   "what": "ripple, all PIM time in one block (K)",
+   "paper": "3.7",
+   "full": 3.661,
+   "quick": 3.6610423074926217,
+   "tol": {
+    "full": 0.002,
+    "quick": 0.002
+   }
+  },
+  {
+   "id": "bank.ripple.pim_on_per_layer_us",
+   "what": "PIM on time per layer (us)",
+   "paper": "21.3",
+   "full": 21.307499999999997,
+   "quick": 21.307499999999997,
+   "tol": {
+    "full": 0.001,
+    "quick": 0.001
+   }
+  },
+  {
+   "id": "beta.summary.every_bank",
+   "what": "beta, PIM at every bank, x = 0 (direct runs)",
+   "paper": "1.09",
+   "full": 1.08845,
+   "quick": 1.08845,
+   "tol": {
+    "full": 0.002,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "beta.summary.every_bank_range[0]",
+   "what": "  range low (floorplans, MAC share)",
+   "paper": "1.03",
+   "full": 1.02609,
+   "quick": 1.02609,
+   "tol": {
+    "full": 0.002,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "beta.summary.every_bank_range[1]",
+   "what": "  range high",
+   "paper": "1.13",
+   "full": 1.1322,
+   "quick": 1.1322,
+   "tol": {
+    "full": 0.002,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "beta.summary.half[0]",
+   "what": "beta, half of the channels, x = 0, low",
+   "paper": "1.51",
+   "full": 1.50834,
+   "quick": 1.50834,
+   "tol": {
+    "full": 0.002,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "beta.summary.half[1]",
+   "what": "beta, half of the channels, x = 0, high",
+   "paper": "1.80",
+   "full": 1.80244,
+   "quick": 1.80244,
+   "tol": {
+    "full": 0.002,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "beta.summary.quarter[0]",
+   "what": "beta, quarter of the channels, x = 0, low",
+   "paper": "1.75",
+   "full": 1.75062,
+   "quick": 1.75062,
+   "tol": {
+    "full": 0.002,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "beta.summary.quarter[1]",
+   "what": "beta, quarter of the channels, x = 0, high",
+   "paper": "2.86",
+   "full": 2.85847,
+   "quick": 2.85847,
+   "tol": {
+    "full": 0.002,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "beta.summary.every_bank_grid128",
+   "what": "  same on grid 128",
+   "paper": "",
+   "full": 1.08152,
+   "tol": {
+    "full": 0.002,
+    "quick": 0.002
+   }
+  },
+  {
+   "id": "beta.summary.every_bank_by_gpu.H200",
+   "what": "  same beta at the H200 operating point",
+   "paper": "",
+   "full": 1.08974,
+   "quick": 1.08974,
+   "tol": {
+    "full": 0.002,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "beta.summary.every_bank_by_gpu.B200",
+   "what": "  same beta at the B200 operating point",
+   "paper": "",
+   "full": 1.09062,
+   "quick": 1.09062,
+   "tol": {
+    "full": 0.002,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "beta.summary.thresholds_e_x_at_1p11.H100",
+   "what": "H100 threshold at beta 1.11 from the exported operating points (pJ/bit)",
+   "paper": "1.84",
+   "full": 1.83551,
+   "quick": 1.83551,
+   "tol": {
+    "full": 0.0001,
+    "quick": 0.0001
+   }
+  },
+  {
+   "id": "beta.summary.thresholds_e_x_at_1p11.H200",
+   "what": "  H200",
+   "paper": "",
+   "full": 1.52891,
+   "quick": 1.52891,
+   "tol": {
+    "full": 0.0001,
+    "quick": 0.0001
+   }
+  },
+  {
+   "id": "beta.summary.thresholds_e_x_at_1p11.B200",
+   "what": "  B200",
+   "paper": "",
+   "full": 1.89878,
+   "quick": 1.89878,
+   "tol": {
+    "full": 0.0001,
+    "quick": 0.0001
+   }
+  },
+  {
+   "id": "beta.summary.threshold_H100_e_x",
+   "what": "H100 threshold at the x = 0 beta (pJ/bit), where beta is evaluated",
+   "paper": "",
+   "full": 1.87226,
+   "quick": 1.87226,
+   "tol": {
+    "full": 0.003,
+    "quick": 0.0001
+   }
+  },
+  {
+   "id": "beta.check_family_x0.rel",
+   "what": "x = 0: family over direct run, minus 1",
+   "paper": "",
+   "full": 0.0,
+   "quick": 2e-05,
+   "tol": {
+    "full": 0.005,
+    "quick": 0.005
+   }
+  },
+  {
+   "id": "recal.summary.x0.ratio",
+   "what": "HotSpot row-miss ratio, x = 0",
+   "paper": "1.18",
+   "full": 1.17852,
+   "quick": 1.17852,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.x1.ratio",
+   "what": "HotSpot row-miss ratio, x = 1",
+   "paper": "0.69",
+   "full": 0.69342,
+   "quick": 0.69342,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.x0.beta",
+   "what": "beta, x = 0 (memory W in the DRAM dies), recalibration family",
+   "paper": "1.09",
+   "full": 1.08846,
+   "quick": 1.08847,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.x0.beta_local",
+   "what": "  comparison: local slope at the fixed point",
+   "paper": "",
+   "full": 1.12833,
+   "quick": 1.12833,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "recal.summary.x0.beta_H200",
+   "what": "  same beta at the H200 operating point",
+   "paper": "",
+   "full": 1.09067,
+   "quick": 1.09067,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.x0.beta_B200",
+   "what": "  same beta at the B200 operating point",
+   "paper": "",
+   "full": 1.09436,
+   "quick": 1.09437,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.x1.beta",
+   "what": "beta, x = 1 (memory W in the base die)",
+   "paper": "0.67",
+   "full": 0.66753,
+   "quick": 0.66753,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.x1.beta_local",
+   "what": "  comparison: local slope at the fixed point",
+   "paper": "",
+   "full": 0.65394,
+   "quick": 0.65394,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "recal.summary.best.x",
+   "what": "x matching the measured ratio",
+   "paper": "98 %",
+   "full": 0.97511,
+   "quick": 0.97511,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.best.k",
+   "what": "  bond-layer k there (W/m-K)",
+   "paper": "1.9",
+   "full": 1.92697,
+   "quick": 1.92697,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.best.r",
+   "what": "  r_convec there (K/W)",
+   "paper": "0.0103",
+   "full": 0.01031,
+   "quick": 0.01031,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.best.beta",
+   "what": "  beta there",
+   "paper": "0.67",
+   "full": 0.67361,
+   "quick": 0.67361,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.best.beta_local",
+   "what": "  comparison: local slope at the fixed point",
+   "paper": "",
+   "full": 0.66114,
+   "quick": 0.66114,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "recal.summary.best.beta_H200",
+   "what": "  same beta at the H200 operating point",
+   "paper": "",
+   "full": 0.68335,
+   "quick": 0.68335,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.best.beta_B200",
+   "what": "  same beta at the B200 operating point",
+   "paper": "",
+   "full": 0.68768,
+   "quick": 0.68768,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.best.e_x",
+   "what": "  H100 threshold at that beta (pJ/bit)",
+   "paper": "",
+   "full": 3.0376,
+   "quick": 3.03759,
+   "tol": {
+    "full": 0.0001,
+    "quick": 0.0001
+   }
+  },
+  {
+   "id": "recal.summary.best.beta_fixed_e",
+   "what": "  comparison: same beta at the fixed 1.84 pJ/bit point",
+   "paper": "",
+   "full": 0.64329,
+   "quick": 0.64329,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.best.gpu_die_err",
+   "what": "  GPU-die slope error",
+   "paper": "-15 %",
+   "full": -0.15121,
+   "quick": -0.15121,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.best.base_over_dram",
+   "what": "  base-die W over DRAM-die W",
+   "paper": "1.6",
+   "full": 1.62904,
+   "quick": 1.62904,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.best.beta_half[0]",
+   "what": "  beta, half of the channels, low",
+   "paper": "0.93",
+   "full": 0.93468,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.best.beta_half_local[0]",
+   "what": "  comparison: local slope",
+   "paper": "",
+   "full": 0.95044,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "recal.summary.best.beta_half[1]",
+   "what": "  beta, half of the channels, high",
+   "paper": "1.14",
+   "full": 1.14489,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.best.beta_half_local[1]",
+   "what": "  comparison: local slope",
+   "paper": "",
+   "full": 1.18343,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "recal.summary.best.beta_quarter[0]",
+   "what": "  beta, quarter of the channels, low",
+   "paper": "1.07",
+   "full": 1.07473,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.best.beta_quarter_local[0]",
+   "what": "  comparison: local slope",
+   "paper": "",
+   "full": 1.10564,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "recal.summary.best.beta_quarter[1]",
+   "what": "  beta, quarter of the channels, high",
+   "paper": "1.86",
+   "full": 1.85861,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.best.beta_quarter_local[1]",
+   "what": "  comparison: local slope",
+   "paper": "",
+   "full": 2.02018,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "recal.summary.allowed.x[0]",
+   "what": "smallest x with ratio inside the CI",
+   "paper": "74 %",
+   "full": 0.73766,
+   "quick": 0.73766,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.allowed.beta[0]",
+   "what": "beta over that x range, low",
+   "paper": "0.67",
+   "full": 0.66753,
+   "quick": 0.66753,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.allowed.beta_local[0]",
+   "what": "  comparison: local slope",
+   "paper": "",
+   "full": 0.65394,
+   "quick": 0.65394,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "recal.summary.allowed.beta[1]",
+   "what": "beta over that x range, high",
+   "paper": "0.74",
+   "full": 0.73574,
+   "quick": 0.73574,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.allowed.beta_local[1]",
+   "what": "  comparison: local slope",
+   "paper": "",
+   "full": 0.73449,
+   "quick": 0.73449,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "recal.summary.prior.x",
+   "what": "x from our I/O-and-TSV lower bound (HBM3E)",
+   "paper": "ref only",
+   "full": 0.16496,
+   "quick": 0.16496,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "reference only: our split of the HBM-Power HBM3E model; not used in the reported results"
+  },
+  {
+   "id": "recal.summary.prior.beta",
+   "what": "  beta there",
+   "paper": "ref only",
+   "full": 0.98155,
+   "quick": 0.98155,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "reference only: our split of the HBM-Power HBM3E model; not used in the reported results"
+  },
+  {
+   "id": "recal.summary.prior.beta_local",
+   "what": "  comparison: local slope",
+   "paper": "ref only",
+   "full": 1.01241,
+   "quick": 1.01241,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "reference only: our split of the HBM-Power HBM3E model; not used in the reported results"
+  },
+  {
+   "id": "recal.summary.prior_range.beta[0]",
+   "what": "beta over the prior x range, low",
+   "paper": "ref only",
+   "full": 0.94015,
+   "quick": 0.94016,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "reference only: our split of the HBM-Power HBM3E model; not used in the reported results"
+  },
+  {
+   "id": "recal.summary.prior_range.beta[1]",
+   "what": "beta over the prior x range, high",
+   "paper": "ref only",
+   "full": 1.03724,
+   "quick": 1.03724,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "reference only: our split of the HBM-Power HBM3E model; not used in the reported results"
+  },
+  {
+   "id": "recal.summary.prior.ratio",
+   "what": "  HotSpot row-miss ratio there",
+   "paper": "ref only",
+   "full": 1.06113,
+   "quick": 1.06113,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "reference only: our split of the HBM-Power HBM3E model; not used in the reported results"
+  },
+  {
+   "id": "recal.summary.prior.base_over_dram",
+   "what": "  base-die W over DRAM-die W",
+   "paper": "ref only",
+   "full": 1.753,
+   "quick": 1.753,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "reference only: our split of the HBM-Power HBM3E model; not used in the reported results"
+  },
+  {
+   "id": "recal.summary.prior_range.beta_every_bank[0]",
+   "what": "  comparison: local slope, prior range low",
+   "paper": "ref only",
+   "full": 0.9673,
+   "quick": 0.9673,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "reference only: our split of the HBM-Power HBM3E model; not used in the reported results"
+  },
+  {
+   "id": "recal.summary.prior_range.beta_every_bank[1]",
+   "what": "  comparison: local slope, prior range high",
+   "paper": "ref only",
+   "full": 1.07311,
+   "quick": 1.07311,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "reference only: our split of the HBM-Power HBM3E model; not used in the reported results"
+  },
+  {
+   "id": "recal.summary.basephy_target.x",
+   "what": "x matching the ratio, base-die W on the GPU side",
+   "paper": "36 %",
+   "full": 0.35709,
+   "quick": 0.35709,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.basephy_target.beta",
+   "what": "  beta there",
+   "paper": "0.67",
+   "full": 0.66896,
+   "quick": 0.66895,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.basephy_target.beta_local",
+   "what": "  comparison: local slope",
+   "paper": "",
+   "full": 0.66896,
+   "quick": 0.66896,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "recal.summary.die_average.bottom.x",
+   "what": "die-average sensor (bottom DRAM die): x matching the ratio",
+   "paper": "69 %",
+   "full": 0.68633,
+   "quick": 0.68633,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.die_average.bottom.beta",
+   "what": "  beta there (hottest cell)",
+   "paper": "0.75",
+   "full": 0.74814,
+   "quick": 0.74814,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.die_average.bottom.beta_local",
+   "what": "  comparison: local slope",
+   "paper": "",
+   "full": 0.75397,
+   "quick": 0.75397,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "recal.summary.die_average.bottom.allowed_beta[0]",
+   "what": "  beta, ratio inside the CI, low",
+   "paper": "",
+   "full": 0.67036,
+   "quick": 0.67036,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.die_average.bottom.allowed_beta[1]",
+   "what": "  beta, ratio inside the CI, high",
+   "paper": "",
+   "full": 0.8341,
+   "quick": 0.8341,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.die_average.base.x",
+   "what": "die-average sensor (base die): x matching the ratio",
+   "paper": "52 %",
+   "full": 0.51655,
+   "quick": 0.51655,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.die_average.base.beta",
+   "what": "  beta there (hottest cell)",
+   "paper": "0.81",
+   "full": 0.80655,
+   "quick": 0.80655,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.die_average.base.beta_local",
+   "what": "  comparison: local slope",
+   "paper": "",
+   "full": 0.81663,
+   "quick": 0.81663,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   },
+   "note": "comparison only: f_bank or local-slope normalisation, not the model's beta"
+  },
+  {
+   "id": "recal.summary.die_average.base.allowed_beta[0]",
+   "what": "  beta, ratio inside the CI, low",
+   "paper": "",
+   "full": 0.73246,
+   "quick": 0.73246,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  },
+  {
+   "id": "recal.summary.die_average.base.allowed_beta[1]",
+   "what": "  beta, ratio inside the CI, high",
+   "paper": "",
+   "full": 0.88463,
+   "quick": 0.88463,
+   "tol": {
+    "full": 2e-05,
+    "quick": 2e-05
+   }
+  }
+ ]
+}

@@ -1,0 +1,9 @@
+{
+ "P_G": 332.70657572501557,
+ "P_M": 80.09512998884456,
+ "dM": 20.0,
+ "P_P": 52.10113020039416,
+ "e_pJ_bit": 1.83551,
+ "note": "Operating point for the recalibration beta (steps/recal.py, local definition): H100 GPU+PIM decoding at the in-bank read energy where HBM temperature reaches that of GPU-only decoding with beta 1.11 (1.84 pJ/bit), no power constraint, PIM power averaged over the decode step. P_G non-memory W, P_M memory W, P_P PIM W (all five stacks; includes the 0.16 pJ/B MAC energy), dM the finite-difference step of memory W, e_pJ_bit the in-bank read energy. At the recalibrated thresholds 2.5 / 3.1 pJ/bit the matched beta is 0.684 / 0.696 instead of 0.661 (checks/skeptic/op_result.json).",
+ "source": "analysis repository, abs_threshold.point('H100', 1.83551, 'timing'); rerun in checks/skeptic/op_result.json; inputs listed in gpu_side_calibration.json"
+}

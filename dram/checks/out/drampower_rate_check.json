@@ -1,0 +1,87 @@
+{
+ "note": "The command trace of the bank power map (bank_power/regenerate) comes from LLMSimulator's Ramulator 2 at HBM3 5.2 Gb/s (tCK 0.769 ns), but the committed per-bank energies were priced with HBM-Power's 6.4 Gb/s timing file (tCK 625 ps), so the 105,305-cycle trace spans 65.8 us instead of 81.0 us. This reruns the patched HBM3_runner on both pseudo channels with (a) the 6.4 Gb/s file, as committed, and (b) a 5.2 Gb/s file: tCK 769 ps and every timing kept in ns (ceil(n x 625 / 769) cycles, nREFI 5070, tCCD at the JESD238B.01 minima). Currents and data toggle (0.373, bank group 0) are unchanged; HBM-Power has no 5.2 Gb/s current set.",
+ "timing_5200": {
+  "tCK_ps": 769,
+  "nBL": 8,
+  "nRAS": 37,
+  "nRCD": 26,
+  "nRCDWR": 13,
+  "nRC": 59,
+  "nRL": 17,
+  "nWL": 9,
+  "nCCD_S": 2,
+  "nCCD_L": 4,
+  "nWTR_S": 6,
+  "nWTR_L": 9,
+  "nWR": 27,
+  "nRP": 22,
+  "nRTP": 8,
+  "nRRD_S": 4,
+  "nRRD_L": 5,
+  "nFAW": 20,
+  "nRTW": 17,
+  "nREFI": 5070,
+  "nRFCpb": 261
+ },
+ "runs": {
+  "6.4 Gb/s file (as committed)": {
+   "pseudo_channels": [
+    {
+     "avg_power_mW": 746.6502897269862,
+     "duration_ns": 65815.625,
+     "total_energy_pJ": 49141255.47481268,
+     "refresh_energy_pJ": 316293.1200000001,
+     "shared_sum_pJ": 2493976.6500000004
+    },
+    {
+     "avg_power_mW": 746.643638156423,
+     "duration_ns": 65816.25,
+     "total_energy_pJ": 49141284.34981267,
+     "refresh_energy_pJ": 316293.1200000001,
+     "shared_sum_pJ": 2493952.8625000003
+    }
+   ],
+   "stack_W": 23.892702846134547
+  },
+  "5.2 Gb/s file": {
+   "pseudo_channels": [
+    {
+     "avg_power_mW": 743.6135190453737,
+     "duration_ns": 80979.545,
+     "total_energy_pJ": 60217484.42814319,
+     "refresh_energy_pJ": 318805.11082168325,
+     "shared_sum_pJ": 3080881.48896
+    },
+    {
+     "avg_power_mW": 743.6068963123951,
+     "duration_ns": 80980.314,
+     "total_energy_pJ": 60217519.9559432,
+     "refresh_energy_pJ": 318805.11082168325,
+     "shared_sum_pJ": 3080852.2208200004
+    }
+   ],
+   "stack_W": 23.795526645724298
+  },
+  "committed files": {
+   "pseudo_channels": [
+    {
+     "avg_power_mW": 746.8388999544209,
+     "duration_ns": 65815.625,
+     "total_energy_pJ": 49153668.97481268,
+     "refresh_energy_pJ": 316293.12000000005,
+     "shared_sum_pJ": 2377893.6500000004
+    },
+    {
+     "avg_power_mW": 746.8322465927894,
+     "duration_ns": 65816.25,
+     "total_energy_pJ": 49153697.84981267,
+     "refresh_energy_pJ": 316293.12000000005,
+     "shared_sum_pJ": 2377869.8625000003
+    }
+   ],
+   "stack_W": 23.898738344755365
+  }
+ },
+ "stack_W_change_5200_vs_6400_pct": -0.4067191603898901,
+ "stack_W_change_5200_vs_committed_pct": -0.43187091110069575
+}

@@ -1,0 +1,22 @@
+{
+ "patterns": {
+  "whole_row": {
+   "in_stack": 4.47021,
+   "io_dq": 0.429951,
+   "tsv": 0.614954,
+   "dram_core": 3.42155,
+   "standby": 0.00375977,
+   "reads_per_act": 32
+  },
+  "four_reads": {
+   "in_stack": 5.93658,
+   "io_dq": 0.429951,
+   "tsv": 0.614954,
+   "dram_core": 4.88791,
+   "standby": 0.00375977,
+   "reads_per_act": 4
+  }
+ },
+ "unit": "pJ/bit",
+ "note": "HBM3E read energy split (pJ/bit, 6.4 Gbps) from the HBM power model of Olgun et al.: I/O and DQ in the base die, TSVs none / half / all in the base die, DRAM core and standby in the DRAM dies. Prior on the base-die share x"
+}

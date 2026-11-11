@@ -1,0 +1,32 @@
+HBM3_5.2Gbps  tRFC 350 ns nCCDAB 4 1x    : cycles 95293, worst refresh delay 170 cycles, violations 0
+HBM3_5.2Gbps  tRFC 350 ns nCCDAB 4 2x    : cycles 105804, worst refresh delay 167 cycles, violations 0
+HBM3_5.2Gbps  tRFC 350 ns nCCDAB 4 pbj1x : cycles 98524, worst refresh delay 509 cycles, violations 0
+HBM3_5.2Gbps  tRFC 350 ns nCCDAB 4 pbj2x : cycles 113599, worst refresh delay 510 cycles, violations 0
+HBM3_5.2Gbps  tRFC 350 ns nCCDAB 4 pbh2x : cycles 102147, worst refresh delay 334 cycles, violations 0
+HBM3_5.2Gbps  tRFC 350 ns nCCDAB 6 1x    : cycles 130250, worst refresh delay 220 cycles, violations 0
+HBM3_5.2Gbps  tRFC 350 ns nCCDAB 6 2x    : cycles 144417, worst refresh delay 231 cycles, violations 0
+HBM3_5.2Gbps  tRFC 350 ns nCCDAB 6 pbj1x : cycles 134503, worst refresh delay 572 cycles, violations 0
+HBM3_5.2Gbps  tRFC 350 ns nCCDAB 6 pbj2x : cycles 155608, worst refresh delay 572 cycles, violations 0
+HBM3_5.2Gbps  tRFC 350 ns nCCDAB 6 pbh2x : cycles 139183, worst refresh delay 398 cycles, violations 0
+HBM3_6.4Gbps  tRFC 410 ns nCCDAB 4 1x    : cycles 102689, worst refresh delay 69 cycles, violations 0
+HBM3_6.4Gbps  tRFC 410 ns nCCDAB 4 2x    : cycles 116486, worst refresh delay 180 cycles, violations 0
+HBM3_6.4Gbps  tRFC 410 ns nCCDAB 4 pbj1x : cycles 104785, worst refresh delay 579 cycles, violations 0
+HBM3_6.4Gbps  tRFC 410 ns nCCDAB 4 pbj2x : cycles 122909, worst refresh delay 583 cycles, violations 0
+HBM3_6.4Gbps  tRFC 410 ns nCCDAB 4 pbh2x : cycles 109109, worst refresh delay 373 cycles, violations 0
+HBM3_6.4Gbps  tRFC 410 ns nCCDAB 7 1x    : cycles 155583, worst refresh delay 271 cycles, violations 0
+HBM3_6.4Gbps  tRFC 410 ns nCCDAB 7 2x    : cycles 176607, worst refresh delay 268 cycles, violations 0
+HBM3_6.4Gbps  tRFC 410 ns nCCDAB 7 pbj1x : cycles 159515, worst refresh delay 676 cycles, violations 0
+HBM3_6.4Gbps  tRFC 410 ns nCCDAB 7 pbj2x : cycles 186307, worst refresh delay 672 cycles, violations 0
+HBM3_6.4Gbps  tRFC 410 ns nCCDAB 7 pbh2x : cycles 166209, worst refresh delay 470 cycles, violations 0
+HBM3_8.0Gbps  tRFC 410 ns nCCDAB 5 1x    : cycles 127334, worst refresh delay 207 cycles, violations 0
+HBM3_8.0Gbps  tRFC 410 ns nCCDAB 5 2x    : cycles 143754, worst refresh delay 210 cycles, violations 0
+HBM3_8.0Gbps  tRFC 410 ns nCCDAB 5 pbj1x : cycles 129830, worst refresh delay 710 cycles, violations 0
+HBM3_8.0Gbps  tRFC 410 ns nCCDAB 5 pbj2x : cycles 151324, worst refresh delay 714 cycles, violations 0
+HBM3_8.0Gbps  tRFC 410 ns nCCDAB 5 pbh2x : cycles 135176, worst refresh delay 458 cycles, violations 0
+HBM3_8.0Gbps  tRFC 410 ns nCCDAB 9 1x    : cycles 198240, worst refresh delay 346 cycles, violations 0
+HBM3_8.0Gbps  tRFC 410 ns nCCDAB 9 2x    : cycles 224512, worst refresh delay 347 cycles, violations 0
+HBM3_8.0Gbps  tRFC 410 ns nCCDAB 9 pbj1x : cycles 202140, worst refresh delay 831 cycles, violations 0
+HBM3_8.0Gbps  tRFC 410 ns nCCDAB 9 pbj2x : cycles 236335, worst refresh delay 836 cycles, violations 0
+HBM3_8.0Gbps  tRFC 410 ns nCCDAB 9 pbh2x : cycles 210416, worst refresh delay 588 cycles, violations 0
+spread schedule refused as expected
+TOTAL VIOLATIONS 0

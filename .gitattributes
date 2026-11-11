@@ -1,0 +1,2 @@
+# the AttAcc patches keep the CRLF line ends of the upstream files they change
+dram/patches/** -text

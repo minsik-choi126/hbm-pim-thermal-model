@@ -1,0 +1,231 @@
+% Public sources behind PARAMETERS.md, dram/PARAMETERS.md and thermal/PARAMETERS.md.
+% Our own measurement files and the analysis repository are not listed here.
+
+% ---------------- Standard ----------------
+@standard{jesd238,
+  title        = {High Bandwidth Memory ({HBM3}) {DRAM}},
+  organization = {JEDEC},
+  number       = {JESD238B.01},
+  month        = apr,
+  year         = {2025},
+  note         = {Cited by section, table and page only: Sec. 2, 3.1.2 (Table 3), Table 4, Sec. 6.3.2.2.1, Table 30, Sec. 6.6.1 (Table 44), Sec. 9.1 (Tables 83, 89, 90), Tables 92, 93, Sec. 13.5.12 (Table 121)},
+  url          = {https://www.jedec.org/standards-documents/docs/jesd238b01}
+}
+
+% ---------------- PIM and DRAM papers ----------------
+@inproceedings{attacc,
+  author    = {Jaehyun Park and others},
+  title     = {{AttAcc! Unleashing} the Power of {PIM} for Batched Transformer-based Generative Model Inference},
+  booktitle = {Proc. ASPLOS},
+  year      = {2024},
+  pages     = {103--119},
+  doi       = {10.1145/3620665.3640422}
+}
+@inproceedings{hbmpim,
+  author    = {Sukhan Lee and others},
+  title     = {Hardware Architecture and Software Stack for {PIM} Based on Commercial {DRAM} Technology: Industrial Product},
+  booktitle = {Proc. ISCA},
+  year      = {2021},
+  pages     = {43--56},
+  doi       = {10.1109/ISCA52012.2021.00013}
+}
+@inproceedings{fgdram,
+  author    = {Mike O'Connor and others},
+  title     = {Fine-Grained {DRAM}: Energy-Efficient {DRAM} for Extreme Bandwidth Systems},
+  booktitle = {Proc. MICRO},
+  year      = {2017},
+  pages     = {41--54},
+  doi       = {10.1145/3123939.3124545}
+}
+@inproceedings{neupims,
+  author    = {Guseul Heo and others},
+  title     = {{NeuPIMs}: {NPU-PIM} Heterogeneous Acceleration for Batched {LLM} Inferencing},
+  booktitle = {Proc. ASPLOS},
+  year      = {2024},
+  pages     = {722--737},
+  doi       = {10.1145/3620666.3651380}
+}
+@inproceedings{mukundan13,
+  author    = {Janani Mukundan and Hillery Hunter and Kyu-Hyoun Kim and Jeffrey Stuecheli and Jos{\'e} F. Mart{\'\i}nez},
+  title     = {Understanding and Mitigating Refresh Overheads in High-Density {DDR4} {DRAM} Systems},
+  booktitle = {Proc. ISCA},
+  year      = {2013},
+  pages     = {48--59},
+  doi       = {10.1145/2485922.2485927}
+}
+@inproceedings{hbmrd,
+  author    = {Ataberk Olgun and others},
+  title     = {Read Disturbance in High Bandwidth Memory: A Detailed Experimental Study on {HBM2} {DRAM} Chips},
+  booktitle = {Proc. DSN},
+  year      = {2024},
+  pages     = {75--89},
+  doi       = {10.1109/DSN58291.2024.00022},
+  note      = {arXiv:2310.14665v3}
+}
+@misc{hbmpower,
+  author = {Ataberk Olgun and others},
+  title  = {Understanding the Power Consumption of Modern {High Bandwidth Memory}: Experimental Analysis and Modeling Using Real {HBM2} {DRAM} Chips},
+  year   = {2026},
+  note   = {arXiv:2610.14244, extended version of a paper in Proc. MICRO 2026},
+  doi    = {10.48550/arXiv.2610.14244}
+}
+@misc{hbmpowerart,
+  author       = {Ataberk Olgun},
+  title        = {{CMU-SAFARI/HBM-Power}: {MICRO'26} Artifact Evaluation - v0.3},
+  howpublished = {Zenodo},
+  year         = {2026},
+  note         = {v0.3-alpha, commit 4642c61f856cbd9d5d3f37d56214e5dbfa663703 (data/all_idd_measurements.csv, data/HBM3E_measurements.csv, sources/figure16/configs, sources/table3/configs)},
+  doi          = {10.5281/zenodo.21970747}
+}
+@misc{hbmpowermain,
+  title        = {{HBM-Power} (main branch)},
+  howpublished = {\url{https://github.com/CMU-SAFARI/HBM-Power}},
+  note         = {Commit 61aada9a54ec349efde024b77f868b1a7ebeba0e: config/HBM3E_6400MTs/power.json (sha256 8507bfaf...), docs/explanation/idd-derivation.md},
+  year         = {2026}
+}
+
+% ---------------- Simulators (pinned code) ----------------
+@misc{attaccsim,
+  author       = {Jaehyun Park and others},
+  title        = {Simulator for {AttAcc}},
+  howpublished = {\url{https://github.com/scale-snu/attacc_simulator}},
+  note         = {Commit c60005143a6b492d7ef83231723386478b59a506 (src/config.py, src/devices.py, src/ramulator_wrapper.py, pim_ramulator_src/HBM3-PIM.cpp, README.md)},
+  year         = {2024}
+}
+@article{ramulator2,
+  author  = {Haocong Luo and Yahya Can Tu{\u{g}}rul and F. Nisa Bostanc{\i} and Ataberk Olgun and A. Giray Ya{\u{g}}l{\i}k{\c{c}}{\i} and Onur Mutlu},
+  title   = {{Ramulator} 2.0: A Modern, Modular, and Extensible {DRAM} Simulator},
+  journal = {IEEE Comput. Archit. Lett.},
+  year    = {2023},
+  note    = {arXiv:2308.11030; code \url{https://github.com/CMU-SAFARI/ramulator2} at b7c70275f04126c647edb989270cc429776955d1 (src/dram/impl/HBM2.cpp, HBM3.cpp)}
+}
+@misc{dramsim3hbm2,
+  title        = {{DRAMsim3} {HBM2\_8Gb\_x128} configuration},
+  howpublished = {\url{https://github.com/umd-memsys/DRAMsim3/blob/29817593b3389f1337235d63cac515024ab8fd6e/configs/HBM2_8Gb_x128.ini}},
+  note         = {Commit 29817593b3389f1337235d63cac515024ab8fd6e},
+  year         = {2020}
+}
+@article{hotspot,
+  author  = {Wei Huang and Shougata Ghosh and Siva Velusamy and Karthik Sankaranarayanan and Kevin Skadron and Mircea R. Stan},
+  title   = {{HotSpot}: A Compact Thermal Modeling Methodology for Early-Stage {VLSI} Design},
+  journal = {IEEE Trans. Very Large Scale Integr. (VLSI) Syst.},
+  volume  = {14},
+  number  = {5},
+  pages   = {501--513},
+  year    = {2006},
+  doi     = {10.1109/TVLSI.2006.876103}
+}
+@techreport{hotspot6,
+  author      = {Runjie Zhang and Mircea R. Stan and Kevin Skadron},
+  title       = {{HotSpot} 6.0: Validation, Acceleration and Extension},
+  institution = {Univ. Virginia},
+  number      = {CS-2015-04},
+  year        = {2015},
+  url         = {https://www.cs.virginia.edu/~skadron/Papers/HotSpot60_TR.pdf}
+}
+@misc{hotspotcode,
+  title        = {{HotSpot} 6.0 source},
+  howpublished = {\url{https://github.com/uvahotspot/HotSpot}},
+  note         = {Commit 47b1e83c19 (temperature.c, temperature.h, temperature_grid.c, hotspot.c, util.h, HOWTO, README-6.0)}
+}
+@misc{cometcode,
+  title        = {{CoMeT} thermal simulation toolchain},
+  howpublished = {\url{https://github.com/marg-tools/CoMeT}},
+  note         = {Commit 250ba95d1b3fde119766e92ef347226514c541e8 (floorplanlib/create.py:12-16)}
+}
+
+% ---------------- Thermal papers ----------------
+@inproceedings{hms,
+  author    = {Jeongmin Hong and Sungjun Cho and Geonwoo Park and Wonhyuk Yang and Young-Ho Gong and Gwangsun Kim},
+  title     = {Bandwidth-Effective {DRAM} Cache for {GPUs} with Storage-Class Memory},
+  booktitle = {Proc. HPCA},
+  year      = {2024},
+  pages     = {139--155},
+  doi       = {10.1109/HPCA57654.2024.00021},
+  note      = {arXiv:2403.09358 (Table II, Sec. IV-E)}
+}
+@inproceedings{xylem,
+  author    = {Aditya Agrawal and Josep Torrellas and Sachin Idgunji},
+  title     = {Xylem: Enhancing Vertical Thermal Conduction in {3D} Processor-Memory Stacks},
+  booktitle = {Proc. MICRO},
+  year      = {2017},
+  url       = {https://iacoma.cs.uiuc.edu/iacoma-papers/micro17_2.pdf},
+  note      = {Sec. 2.5, p.3 (die-to-die layer 1.5 W/m-K, 20 um)}
+}
+@inproceedings{eckert14,
+  author    = {Yasuko Eckert and Nuwan Jayasena and Gabriel H. Loh},
+  title     = {Thermal Feasibility of Die-Stacked Processing in Memory},
+  booktitle = {Proc. WoNDP},
+  year      = {2014},
+  url       = {https://www-old.cs.utah.edu/wondp/eckert.pdf}
+}
+@inproceedings{toppim,
+  author    = {Dongping Zhang and others},
+  title     = {{TOP-PIM}: Throughput-Oriented Programmable Processing in Memory},
+  booktitle = {Proc. HPDC},
+  year      = {2014},
+  note      = {Origin of the 10 W PIM-logic TDP quoted by Hong et al.; cited only to say it is not an HBM base-die share}
+}
+
+% ---------------- Workloads ----------------
+@misc{llama,
+  author = {Hugo Touvron and others},
+  title  = {{LLaMA}: Open and Efficient Foundation Language Models},
+  year   = {2023},
+  note   = {arXiv:2302.13971 (Table 2); code \url{https://github.com/meta-llama/llama/tree/llama_v1} (model.py)},
+  doi    = {10.48550/arXiv.2302.13971}
+}
+@misc{llama3,
+  author = {Aaron Grattafiori and others},
+  title  = {The {Llama} 3 Herd of Models},
+  year   = {2024},
+  note   = {arXiv:2407.21783 (Table 3)},
+  doi    = {10.48550/arXiv.2407.21783}
+}
+@inproceedings{vllm,
+  author    = {Woosuk Kwon and others},
+  title     = {Efficient Memory Management for Large Language Model Serving with {PagedAttention}},
+  booktitle = {Proc. SOSP},
+  year      = {2023},
+  pages     = {611--626},
+  doi       = {10.1145/3600006.3613165},
+  note      = {vLLM 0.17.0 used for the measurements}
+}
+
+% ---------------- Datasheets, whitepapers, web ----------------
+@techreport{h100wp,
+  author      = {{NVIDIA}},
+  title       = {{NVIDIA H100} Tensor Core {GPU} Architecture},
+  institution = {NVIDIA},
+  number      = {V1.02},
+  year        = {2022},
+  url         = {https://resources.nvidia.com/en-us-tensor-core/gtc22-whitepaper-hopper},
+  note        = {p.17 (814 mm2), p.18 (5 HBM3 stacks on H100 SXM5; 6 sites on GH100), p.19 Fig. 6, p.36, p.39 Table 3 (A100 column), p.40. Same stack text: \url{https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/}}
+}
+@misc{nvh100,
+  author = {{NVIDIA}}, title = {{H100} Tensor Core {GPU}}, howpublished = {\url{https://www.nvidia.com/en-us/data-center/h100/}},
+  note = {80 GB, 3.35 TB/s, up to 700 W; fetched 2026-11-11}
+}
+@misc{nvh200,
+  author = {{NVIDIA}}, title = {{H200} Tensor Core {GPU}}, howpublished = {\url{https://www.nvidia.com/en-us/data-center/h200/}},
+  note = {141 GB, 4.8 TB/s, up to 700 W; fetched 2026-11-11}
+}
+@misc{nvdgxb200,
+  author = {{NVIDIA}}, title = {{DGX B200}}, howpublished = {\url{https://www.nvidia.com/en-us/data-center/dgx-b200/}},
+  note = {1,440 GB and 64 TB/s HBM3e for 8 GPUs; fetched 2026-11-11}
+}
+@misc{nvblackwellultra,
+  author = {{NVIDIA}}, title = {Inside {NVIDIA Blackwell Ultra}: The Chip Powering the {AI} Factory Era},
+  howpublished = {\url{https://developer.nvidia.com/blog/inside-nvidia-blackwell-ultra-the-chip-powering-the-ai-factory-era/}},
+  note = {Capacity table only (Blackwell B200 192 GB HBM3E); its eight-stack 8,192-bit line describes B300 and is not cited for B200}
+}
+@misc{lenovolp2226,
+  author = {{Lenovo Press}}, title = {{ThinkSystem NVIDIA HGX B200 180GB 1000W GPU} (LP2226)},
+  howpublished = {\url{https://lenovopress.lenovo.com/lp2226-thinksystem-nvidia-b200-180gb-1000w-gpu}},
+  note = {Table 2: TGP 1000 W, 7.7 TB/s, FP16 2.25 PFLOPS dense}
+}
+@misc{sthhbm,
+  author = {{ServeTheHome}}, title = {{SK hynix} {HBM} Packaging at Hot Chips 2026},
+  howpublished = {\url{https://www.servethehome.com/sk-hynix-hbm-packaging-at-hot-chips-2026/}},
+  note = {HBM package 10 x 11 mm (HBM2E-HBM3E), 12.4 x 11 mm on HBM4; fetched 2026-11-11}
+}

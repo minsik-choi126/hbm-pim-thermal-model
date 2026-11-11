@@ -1,0 +1,32 @@
+{
+ "h100_transient_dt2_r1.csv": {
+  "thbm": {
+   "t63_first_sample_at_or_above": 14.2,
+   "share_missing_at_60s": 0.08333333333333337
+  },
+  "tgpu": {
+   "t63_first_sample_at_or_above": 8.1,
+   "share_missing_at_60s": 0.053537284894837334
+  }
+ },
+ "h100_transient_dt2_r2.csv": {
+  "thbm": {
+   "t63_first_sample_at_or_above": 16.3,
+   "share_missing_at_60s": 0.08333333333333337
+  },
+  "tgpu": {
+   "t63_first_sample_at_or_above": 8.1,
+   "share_missing_at_60s": 0.08571428571428574
+  }
+ },
+ "h100_transient_dt2_r3.csv": {
+  "thbm": {
+   "t63_first_sample_at_or_above": 18.2,
+   "share_missing_at_60s": 0.08244680851063846
+  },
+  "tgpu": {
+   "t63_first_sample_at_or_above": 6.1,
+   "share_missing_at_60s": 0.020522388059701524
+  }
+ }
+}

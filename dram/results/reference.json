@@ -1,0 +1,508 @@
+{
+ "note": "Values the dram scripts reproduce, rounded as reported; checked by python -m dram.check. tol: allowed |computed - value|; range: allowed interval; exact: equality.",
+ "values": [
+  {
+   "name": "PIM bandwidth at AttAcc's power constraint, H100",
+   "file": "pim_table.json",
+   "key": "gpus.H100.pim_bw_TBs_stack",
+   "value": 5.38,
+   "unit": "TB/s per stack",
+   "tol": 0.005
+  },
+  {
+   "name": "PIM power at AttAcc's power constraint, H100",
+   "file": "pim_table.json",
+   "key": "gpus.H100.pim_W_stack",
+   "value": 24.5,
+   "unit": "W per stack",
+   "tol": 0.05
+  },
+  {
+   "name": "PIM bandwidth at tCCD_L, H100",
+   "file": "pim_table.json",
+   "key": "gpus.H100.pim_bw_timing_TBs_stack",
+   "value": 7.4,
+   "unit": "TB/s per stack",
+   "tol": 0.005
+  },
+  {
+   "name": "MAC interval, H100",
+   "file": "pim_table.json",
+   "key": "gpus.H100.mac_interval_clk",
+   "value": 6,
+   "unit": "clocks",
+   "exact": true
+  },
+  {
+   "name": "MAC interval, H100",
+   "file": "pim_table.json",
+   "key": "gpus.H100.mac_interval_ns",
+   "value": 4.6,
+   "unit": "ns",
+   "tol": 0.05
+  },
+  {
+   "name": "tCCD_L limit, H100",
+   "file": "pim_table.json",
+   "key": "gpus.H100.timing_limit_clk",
+   "value": 4,
+   "unit": "clocks",
+   "exact": true
+  },
+  {
+   "name": "KV-capacity batch, H100",
+   "file": "pim_table.json",
+   "key": "gpus.H100.batch",
+   "value": 94,
+   "unit": "",
+   "exact": true
+  },
+  {
+   "name": "PIM bandwidth at AttAcc's power constraint, H200",
+   "file": "pim_table.json",
+   "key": "gpus.H200.pim_bw_TBs_stack",
+   "value": 5.72,
+   "unit": "TB/s per stack",
+   "tol": 0.005
+  },
+  {
+   "name": "PIM power at AttAcc's power constraint, H200",
+   "file": "pim_table.json",
+   "key": "gpus.H200.pim_W_stack",
+   "value": 26.1,
+   "unit": "W per stack",
+   "tol": 0.05
+  },
+  {
+   "name": "PIM bandwidth at tCCD_L, H200",
+   "file": "pim_table.json",
+   "key": "gpus.H200.pim_bw_timing_TBs_stack",
+   "value": 8.83,
+   "unit": "TB/s per stack",
+   "tol": 0.005
+  },
+  {
+   "name": "MAC interval, H200",
+   "file": "pim_table.json",
+   "key": "gpus.H200.mac_interval_clk",
+   "value": 7,
+   "unit": "clocks",
+   "exact": true
+  },
+  {
+   "name": "MAC interval, H200",
+   "file": "pim_table.json",
+   "key": "gpus.H200.mac_interval_ns",
+   "value": 4.4,
+   "unit": "ns",
+   "tol": 0.05
+  },
+  {
+   "name": "tCCD_L limit, H200",
+   "file": "pim_table.json",
+   "key": "gpus.H200.timing_limit_clk",
+   "value": 4,
+   "unit": "clocks",
+   "exact": true
+  },
+  {
+   "name": "KV-capacity batch, H200",
+   "file": "pim_table.json",
+   "key": "gpus.H200.batch",
+   "value": 185,
+   "unit": "",
+   "exact": true
+  },
+  {
+   "name": "PIM bandwidth at AttAcc's power constraint, B200",
+   "file": "pim_table.json",
+   "key": "gpus.B200.pim_bw_TBs_stack",
+   "value": 5.45,
+   "unit": "TB/s per stack",
+   "tol": 0.005
+  },
+  {
+   "name": "PIM power at AttAcc's power constraint, B200",
+   "file": "pim_table.json",
+   "key": "gpus.B200.pim_W_stack",
+   "value": 24.8,
+   "unit": "W per stack",
+   "tol": 0.05
+  },
+  {
+   "name": "PIM bandwidth at tCCD_L, B200",
+   "file": "pim_table.json",
+   "key": "gpus.B200.pim_bw_timing_TBs_stack",
+   "value": 8.9,
+   "unit": "TB/s per stack",
+   "tol": 0.005
+  },
+  {
+   "name": "MAC interval, B200",
+   "file": "pim_table.json",
+   "key": "gpus.B200.mac_interval_clk",
+   "value": 9,
+   "unit": "clocks",
+   "exact": true
+  },
+  {
+   "name": "MAC interval, B200",
+   "file": "pim_table.json",
+   "key": "gpus.B200.mac_interval_ns",
+   "value": 4.5,
+   "unit": "ns",
+   "tol": 0.05
+  },
+  {
+   "name": "tCCD_L limit, B200",
+   "file": "pim_table.json",
+   "key": "gpus.B200.timing_limit_clk",
+   "value": 5,
+   "unit": "clocks",
+   "exact": true
+  },
+  {
+   "name": "KV-capacity batch, B200",
+   "file": "pim_table.json",
+   "key": "gpus.B200.batch",
+   "value": 244,
+   "unit": "",
+   "exact": true
+  },
+  {
+   "name": "PIM energy",
+   "file": "pim_table.json",
+   "key": "energy.pim_pJ_B",
+   "value": 4.56,
+   "unit": "pJ/B",
+   "tol": 0.005
+  },
+  {
+   "name": "PIM energy",
+   "file": "pim_table.json",
+   "key": "energy.pim_pJ_bit",
+   "value": 0.57,
+   "unit": "pJ/bit",
+   "tol": 0.005
+  },
+  {
+   "name": "in-bank read energy (ACT + cell)",
+   "file": "pim_table.json",
+   "key": "energy.in_bank_pJ_bit",
+   "value": 0.55,
+   "unit": "pJ/bit",
+   "tol": 0.005
+  },
+  {
+   "name": "MAC energy",
+   "file": "pim_table.json",
+   "key": "energy.mac_pJ",
+   "value": 0.32,
+   "unit": "pJ/MAC",
+   "tol": 0.005
+  },
+  {
+   "name": "MAC energy per KV byte",
+   "file": "pim_table.json",
+   "key": "energy.mac_pJ_B",
+   "value": 0.16,
+   "unit": "pJ/B",
+   "tol": 0.005
+  },
+  {
+   "name": "channel load kappa, H100",
+   "file": "pim_table.json",
+   "key": "gpus.H100.kappa",
+   "value": 1.06,
+   "unit": "",
+   "tol": 0.005
+  },
+  {
+   "name": "PIM power step average, H100",
+   "file": "pim_table.json",
+   "key": "gpus.H100.pim_W_stack_step_avg",
+   "value": 23.1,
+   "unit": "W per stack",
+   "tol": 0.05
+  },
+  {
+   "name": "PIM power step average at tCCD_L, H100",
+   "file": "pim_table.json",
+   "key": "gpus.H100.pim_W_timing_stack_step_avg",
+   "value": 31.7,
+   "unit": "W per stack",
+   "tol": 0.05
+  },
+  {
+   "name": "refresh factor r_gpu, H100 (tRFC 350 ns)",
+   "file": "pim_table.json",
+   "key": "gpus.H100.r_gpu",
+   "value": 1.11,
+   "unit": "",
+   "tol": 0.005
+  },
+  {
+   "name": "refresh factor r_gpu, H200 (tRFC 410 ns)",
+   "file": "pim_table.json",
+   "key": "gpus.H200.r_gpu",
+   "value": 1.13,
+   "unit": "",
+   "tol": 0.005
+  },
+  {
+   "name": "refresh factor r_gpu, B200 (tRFC 410 ns)",
+   "file": "pim_table.json",
+   "key": "gpus.B200.r_gpu",
+   "value": 1.13,
+   "unit": "",
+   "tol": 0.005
+  },
+  {
+   "name": "refresh factor r_pim, minimum",
+   "file": "pim_table.json",
+   "key": "min:gpus.H100.r_pim.6,gpus.H100.r_pim.4,gpus.H200.r_pim.7,gpus.B200.r_pim.9,gpus.B200.r_pim.5",
+   "value": 1.11,
+   "unit": "",
+   "tol": 0.005
+  },
+  {
+   "name": "refresh factor r_pim, maximum",
+   "file": "pim_table.json",
+   "key": "max:gpus.H100.r_pim.6,gpus.H100.r_pim.4,gpus.H200.r_pim.7,gpus.B200.r_pim.9,gpus.B200.r_pim.5",
+   "value": 1.14,
+   "unit": "",
+   "tol": 0.005
+  },
+  {
+   "name": "AttAcc FC per layer, H100",
+   "file": "pim_table.json",
+   "key": "attacc_e2e_h100.fc_us",
+   "value": 82.6,
+   "unit": "us",
+   "tol": 0.05
+  },
+  {
+   "name": "AttAcc GPU attention per layer, H100",
+   "file": "pim_table.json",
+   "key": "attacc_e2e_h100.attn_gpu_us",
+   "value": 296.2,
+   "unit": "us",
+   "tol": 0.05
+  },
+  {
+   "name": "AttAcc PIM attention per layer, H100",
+   "file": "pim_table.json",
+   "key": "attacc_e2e_h100.attn_pim_us",
+   "value": 31.0,
+   "unit": "us",
+   "tol": 0.05
+  },
+  {
+   "name": "model PIM attention per layer, H100",
+   "file": "pim_table.json",
+   "key": "attacc_e2e_h100.attn_pim_model_us",
+   "value": 31.2,
+   "unit": "us",
+   "tol": 0.05
+  },
+  {
+   "name": "PIM attention, model vs AttAcc",
+   "file": "pim_table.json",
+   "key": "attacc_e2e_h100.attn_pim_err_pct",
+   "value": 0.6,
+   "unit": "%",
+   "range": [
+    0.5,
+    0.6
+   ]
+  },
+  {
+   "name": "AttAcc GPU+PIM speedup, H100",
+   "file": "pim_table.json",
+   "key": "attacc_e2e_h100.speedup",
+   "value": 2.08,
+   "unit": "",
+   "tol": 0.005
+  },
+  {
+   "name": "AttAcc power per GPU, GPU only",
+   "file": "pim_table.json",
+   "key": "attacc_e2e_h100.power_W_per_gpu",
+   "value": 83,
+   "unit": "W",
+   "tol": 0.5
+  },
+  {
+   "name": "AttAcc DRAM power per GPU, GPU only",
+   "file": "pim_table.json",
+   "key": "attacc_e2e_h100.dram_W_per_gpu",
+   "value": 58,
+   "unit": "W",
+   "tol": 0.5
+  },
+  {
+   "name": "HBM2 chips with IDD7 data",
+   "file": "idd7_chips.json",
+   "key": "n_chips",
+   "value": 35,
+   "unit": "",
+   "exact": true
+  },
+  {
+   "name": "IDD7 estimate over AttAcc PIM power, H100, lowest",
+   "file": "idd7_chips.json",
+   "key": "gpus.H100.range_over_attacc.0",
+   "value": 1.1,
+   "unit": "",
+   "tol": 0.005
+  },
+  {
+   "name": "IDD7 estimate over AttAcc PIM power, H100, highest",
+   "file": "idd7_chips.json",
+   "key": "gpus.H100.range_over_attacc.1",
+   "value": 1.51,
+   "unit": "",
+   "tol": 0.005
+  },
+  {
+   "name": "IDD7 stack power, highest chip, H100",
+   "file": "idd7_chips.json",
+   "key": "gpus.H100.idd7_W_stack.hbm2_highest",
+   "value": 37.2,
+   "unit": "W per stack",
+   "tol": 0.05
+  },
+  {
+   "name": "IDD7 stack power, highest chip, H200",
+   "file": "idd7_chips.json",
+   "key": "gpus.H200.idd7_W_stack.hbm2_highest",
+   "value": 41.2,
+   "unit": "W per stack",
+   "tol": 0.05
+  },
+  {
+   "name": "IDD7 stack power, highest chip, B200",
+   "file": "idd7_chips.json",
+   "key": "gpus.B200.idd7_W_stack.hbm2_highest",
+   "value": 40.7,
+   "unit": "W per stack",
+   "tol": 0.05
+  },
+  {
+   "name": "chips whose IDD7 allows tCCD_L, H100",
+   "file": "idd7_chips.json",
+   "key": "gpus.H100.chips_allowing_timing",
+   "value": 4,
+   "unit": "",
+   "exact": true
+  },
+  {
+   "name": "chips whose IDD7 allows tCCD_L, B200",
+   "file": "idd7_chips.json",
+   "key": "gpus.B200.chips_allowing_timing",
+   "value": 1,
+   "unit": "",
+   "exact": true
+  },
+  {
+   "name": "PIM energy from HBM2 chips over AttAcc's table",
+   "file": "idd7_chips.json",
+   "key": "pim_energy.hbm2_over_table",
+   "value": 1.35,
+   "unit": "",
+   "tol": 0.005,
+   "note": "read energy is IDD4R above IDD3N1, as DRAMPower and the IDD7 loop use"
+  },
+  {
+   "name": "PIM energy from HBM3E model over AttAcc's table, low",
+   "file": "idd7_chips.json",
+   "key": "pim_energy.hbm3e_model_min",
+   "value": 0.9,
+   "unit": "",
+   "tol": 0.05
+  },
+  {
+   "name": "PIM energy from HBM3E model over AttAcc's table, high",
+   "file": "idd7_chips.json",
+   "key": "pim_energy.hbm3e_model_max",
+   "value": 1.4,
+   "unit": "",
+   "tol": 0.05
+  },
+  {
+   "name": "base-die share x, prior (whole row, half the TSVs)",
+   "file": "hbm3e_split.json",
+   "key": "base_die_share.prior",
+   "value": 0.165,
+   "unit": "",
+   "tol": 0.0005
+  },
+  {
+   "name": "base-die share x, prior range low",
+   "file": "hbm3e_split.json",
+   "key": "base_die_share.range.0",
+   "value": 0.072,
+   "unit": "",
+   "tol": 0.0005
+  },
+  {
+   "name": "base-die share x, prior range high",
+   "file": "hbm3e_split.json",
+   "key": "base_die_share.range.1",
+   "value": 0.234,
+   "unit": "",
+   "tol": 0.0005
+  },
+  {
+   "name": "HBM3E in-stack read energy, whole row",
+   "file": "hbm3e_split.json",
+   "key": "patterns.whole_row.in_stack",
+   "value": 4.47,
+   "unit": "pJ/bit",
+   "tol": 0.005
+  },
+  {
+   "name": "DRAM power per stack (bank power floor)",
+   "file": "bank_power_stack.json",
+   "key": "stack_W",
+   "value": 23.9,
+   "unit": "W",
+   "tol": 0.005
+  },
+  {
+   "name": "block-to-block spread of the bank power map",
+   "file": "bank_power_stack.json",
+   "key": "block_spread_pct",
+   "value": 0.0,
+   "unit": "%",
+   "tol": 0.01
+  },
+  {
+   "name": "per-bank refresh (JESD238 timings) 2x / 1x, H100",
+   "file": "pim_table.json",
+   "key": "gpus.H100.r_pim_per_bank.pbj.6",
+   "value": 1.157,
+   "unit": "",
+   "tol": 0.0005,
+   "note": "per-bank refresh with JESD238B.01 tRFCpb and tRREFD per pseudo channel (mode pbj); the HBM2-derived mode pbh gives 1.085 / 1.095 / 1.093 (comparison)"
+  },
+  {
+   "name": "per-bank refresh (JESD238 timings) 2x / 1x, H200",
+   "file": "pim_table.json",
+   "key": "gpus.H200.r_pim_per_bank.pbj.7",
+   "value": 1.168,
+   "unit": "",
+   "tol": 0.0005,
+   "note": "per-bank refresh with JESD238B.01 tRFCpb and tRREFD per pseudo channel (mode pbj); the HBM2-derived mode pbh gives 1.085 / 1.095 / 1.093 (comparison)"
+  },
+  {
+   "name": "per-bank refresh (JESD238 timings) 2x / 1x, B200",
+   "file": "pim_table.json",
+   "key": "gpus.B200.r_pim_per_bank.pbj.9",
+   "value": 1.169,
+   "unit": "",
+   "tol": 0.0005,
+   "note": "per-bank refresh with JESD238B.01 tRFCpb and tRREFD per pseudo channel (mode pbj); the HBM2-derived mode pbh gives 1.085 / 1.095 / 1.093 (comparison)"
+  }
+ ]
+}

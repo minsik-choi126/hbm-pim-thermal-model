@@ -1,0 +1,28 @@
+{
+ "step_ms": 17.972723078520257,
+ "pim_on_ms": 1.704616898299358,
+ "layers": 80,
+ "pim_W_per_stack_on": 133.92740228979116,
+ "on": [
+  80.38571858978133,
+  7.802061743341406,
+  133.92740228979116
+ ],
+ "off": [
+  359.14544894733535,
+  15.353460922405361,
+  0.0
+ ],
+ "columns": [
+  "GPU W",
+  "memory heat W per stack",
+  "PIM W per stack"
+ ],
+ "note": "Two-phase decode step for the ripple study: H100, LLaMA-65B with TP 8, context 2048, PIM at tCCD_L with the in-bank energy at 26.4 % of the measured KV read energy. on = PIM phase (GPU at idle, memory at idle, PIM at its running power), off = rest of the step (GPU and memory dynamic energy spread over it)",
+ "s": 0.264,
+ "ek": 3.9682,
+ "mu_K_pJ_B": 67.94,
+ "P_P_step_avg_W": 63.51,
+ "rail_heat": 0.832,
+ "derivation": "in-bank energy = s x mu_K = 0.264 x 67.94 pJ/B (HBM-PIM Sec. VII-C share, measured H100 KV read energy); ek = (0.264 x 67.94 + 0.16) / 4.56 = 3.968 (PIM energy over the AttAcc table energy, MAC 0.16 pJ/B included); pim_W_per_stack_on = PIM power while on; P_P_step_avg_W = 5 x 133.93 x 1.7046 / 17.973 = 63.51 W (all stacks); off-phase memory heat per stack = (39.01 + 0.832 x 45.39) / 5 = 15.35 W, rail_heat 0.832 = measured share of memory-rail power that heats the HBM (gpu_side_calibration.json)"
+}

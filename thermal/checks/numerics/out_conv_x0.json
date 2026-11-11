@@ -1,0 +1,293 @@
+{
+ "point": {
+  "k": 0.95369,
+  "r": 0.01102,
+  "x": 0.0
+ },
+ "op": {
+  "P_G": 332.706576,
+  "P_M": 80.09513,
+  "dM": 20.0,
+  "P_P": 52.10113,
+  "at_e": 1.83551,
+  "src": "abs_threshold.point(H100, e_x, timing)"
+ },
+ "unit_peak_dram_rise_per_W": {
+  "32": {
+   "gpu": 0.0347,
+   "uni": 0.9406,
+   "base": 1.666,
+   "array": 1.07835,
+   "edge": 0.98635
+  },
+  "64": {
+   "gpu": 0.03198,
+   "uni": 0.9565,
+   "base": 1.6894,
+   "array": 1.09005,
+   "edge": 1.01595
+  },
+  "128": {
+   "gpu": 0.0315,
+   "uni": 0.9616,
+   "base": 1.6952,
+   "array": 1.0899,
+   "edge": 1.0368
+  }
+ },
+ "unit_peak_rel_128_vs_64": {
+  "gpu": -0.015009,
+  "uni": 0.005332,
+  "base": 0.003433,
+  "array": -0.000138,
+  "edge": 0.020523
+ },
+ "cell": {
+  "by_grid": {
+   "32": {
+    "a_G": 0.021382,
+    "a_M": 0.1864,
+    "ratio": 1.18369,
+    "a_M_local": 0.182199,
+    "beta_every_bank": 1.134861,
+    "beta_every_bank_amp": 1.10566,
+    "beta_base_die": 1.816647,
+    "beta_uniform_dram": 1.026411,
+    "gpu_die_per_nonmem_W": 0.056807,
+    "base_over_dram": 1.769902,
+    "beta_over_ratio": 0.958748
+   },
+   "64": {
+    "a_G": 0.02255,
+    "a_M": 0.187272,
+    "ratio": 1.178723,
+    "a_M_local": 0.180563,
+    "beta_every_bank": 1.128185,
+    "beta_every_bank_amp": 1.090764,
+    "beta_base_die": 1.841101,
+    "beta_uniform_dram": 1.034306,
+    "gpu_die_per_nonmem_W": 0.056842,
+    "base_over_dram": 1.780035,
+    "beta_over_ratio": 0.957124
+   },
+   "128": {
+    "a_G": 0.022744,
+    "a_M": 0.18762,
+    "ratio": 1.171069,
+    "a_M_local": 0.180759,
+    "beta_every_bank": 1.120566,
+    "beta_every_bank_amp": 1.084107,
+    "beta_base_die": 1.84036,
+    "beta_uniform_dram": 1.033631,
+    "gpu_die_per_nonmem_W": 0.056747,
+    "base_over_dram": 1.780482,
+    "beta_over_ratio": 0.956875
+   }
+  },
+  "rel_128_vs_64": {
+   "a_G": 0.008616,
+   "a_M": 0.001858,
+   "ratio": -0.006494,
+   "a_M_local": 0.001089,
+   "beta_every_bank": -0.006753,
+   "beta_every_bank_amp": -0.006103,
+   "beta_base_die": -0.000402,
+   "beta_uniform_dram": -0.000654,
+   "gpu_die_per_nonmem_W": -0.001672,
+   "base_over_dram": 0.000251,
+   "beta_over_ratio": -0.000261
+  },
+  "richardson": {
+   "a_G": {
+    "order": 2.587308,
+    "used_order": 2.587308,
+    "richardson": 0.022783,
+    "rel_extrap_vs_64": 0.010336
+   },
+   "a_M": {
+    "order": 1.326309,
+    "used_order": 1.326309,
+    "richardson": 0.187851,
+    "rel_extrap_vs_64": 0.00309
+   },
+   "ratio": {
+    "order": -0.624074,
+    "used_order": 1.0,
+    "richardson": 1.163414,
+    "rel_extrap_vs_64": -0.012988
+   },
+   "a_M_local": {
+    "order": null,
+    "used_order": 1.0,
+    "richardson": 0.180956,
+    "rel_extrap_vs_64": 0.002177
+   },
+   "beta_every_bank": {
+    "order": -0.190483,
+    "used_order": 1.0,
+    "richardson": 1.112948,
+    "rel_extrap_vs_64": -0.013506
+   },
+   "beta_every_bank_amp": {
+    "order": 1.161835,
+    "used_order": 1.161835,
+    "richardson": 1.078727,
+    "rel_extrap_vs_64": -0.011036
+   },
+   "beta_base_die": {
+    "order": null,
+    "used_order": 1.0,
+    "richardson": 1.83962,
+    "rel_extrap_vs_64": -0.000805
+   },
+   "beta_uniform_dram": {
+    "order": null,
+    "used_order": 1.0,
+    "richardson": 1.032955,
+    "rel_extrap_vs_64": -0.001307
+   },
+   "gpu_die_per_nonmem_W": {
+    "order": null,
+    "used_order": 1.0,
+    "richardson": 0.056652,
+    "rel_extrap_vs_64": -0.003345
+   },
+   "base_over_dram": {
+    "order": 4.501179,
+    "used_order": 1.0,
+    "richardson": 1.780929,
+    "rel_extrap_vs_64": 0.000503
+   },
+   "beta_over_ratio": {
+    "order": 2.703218,
+    "used_order": 2.703218,
+    "richardson": 0.95683,
+    "rel_extrap_vs_64": -0.000308
+   }
+  }
+ },
+ "coarse": {
+  "by_grid": {
+   "32": {
+    "a_G": 0.02116,
+    "a_M": 0.184975,
+    "ratio": 1.066799,
+    "a_M_local": 0.184975,
+    "beta_every_bank": 1.01111,
+    "beta_every_bank_amp": 1.01111,
+    "beta_base_die": 1.762725,
+    "beta_uniform_dram": 1.0,
+    "gpu_die_per_nonmem_W": 0.056807,
+    "base_over_dram": 1.762725,
+    "beta_over_ratio": 0.947799
+   },
+   "64": {
+    "a_G": 0.021938,
+    "a_M": 0.187765,
+    "ratio": 1.066082,
+    "a_M_local": 0.183212,
+    "beta_every_bank": 1.023328,
+    "beta_every_bank_amp": 0.993777,
+    "beta_base_die": 1.811616,
+    "beta_uniform_dram": 1.029735,
+    "gpu_die_per_nonmem_W": 0.056842,
+    "base_over_dram": 1.759302,
+    "beta_over_ratio": 0.959896
+   },
+   "128": {
+    "a_G": 0.022281,
+    "a_M": 0.188282,
+    "ratio": 1.073499,
+    "a_M_local": 0.181567,
+    "beta_every_bank": 1.044873,
+    "beta_every_bank_amp": 0.997971,
+    "beta_base_die": 1.841706,
+    "beta_uniform_dram": 1.046998,
+    "gpu_die_per_nonmem_W": 0.056747,
+    "base_over_dram": 1.759035,
+    "beta_over_ratio": 0.973335
+   }
+  },
+  "rel_128_vs_64": {
+   "a_G": 0.015626,
+   "a_M": 0.002752,
+   "ratio": 0.006957,
+   "a_M_local": -0.008981,
+   "beta_every_bank": 0.021054,
+   "beta_every_bank_amp": 0.004219,
+   "beta_base_die": 0.01661,
+   "beta_uniform_dram": 0.016764,
+   "gpu_die_per_nonmem_W": -0.001672,
+   "base_over_dram": -0.000152,
+   "beta_over_ratio": 0.014
+  },
+  "richardson": {
+   "a_G": {
+    "order": 1.182022,
+    "used_order": 1.182022,
+    "richardson": 0.022551,
+    "rel_extrap_vs_64": 0.02794
+   },
+   "a_M": {
+    "order": 2.433215,
+    "used_order": 2.433215,
+    "richardson": 0.1884,
+    "rel_extrap_vs_64": 0.003377
+   },
+   "ratio": {
+    "order": null,
+    "used_order": 1.0,
+    "richardson": 1.080915,
+    "rel_extrap_vs_64": 0.013914
+   },
+   "a_M_local": {
+    "order": 0.099456,
+    "used_order": 1.0,
+    "richardson": 0.179921,
+    "rel_extrap_vs_64": -0.017962
+   },
+   "beta_every_bank": {
+    "order": -0.818463,
+    "used_order": 1.0,
+    "richardson": 1.066419,
+    "rel_extrap_vs_64": 0.042109
+   },
+   "beta_every_bank_amp": {
+    "order": null,
+    "used_order": 1.0,
+    "richardson": 1.002164,
+    "rel_extrap_vs_64": 0.008439
+   },
+   "beta_base_die": {
+    "order": 0.700277,
+    "used_order": 0.700277,
+    "richardson": 1.889864,
+    "rel_extrap_vs_64": 0.043193
+   },
+   "beta_uniform_dram": {
+    "order": 0.784507,
+    "used_order": 0.784507,
+    "richardson": 1.070891,
+    "rel_extrap_vs_64": 0.039967
+   },
+   "gpu_die_per_nonmem_W": {
+    "order": null,
+    "used_order": 1.0,
+    "richardson": 0.056652,
+    "rel_extrap_vs_64": -0.003345
+   },
+   "base_over_dram": {
+    "order": 3.67609,
+    "used_order": 3.67609,
+    "richardson": 1.759012,
+    "rel_extrap_vs_64": -0.000165
+   },
+   "beta_over_ratio": {
+    "order": -0.15175,
+    "used_order": 1.0,
+    "richardson": 0.986773,
+    "rel_extrap_vs_64": 0.028001
+   }
+  }
+ }
+}

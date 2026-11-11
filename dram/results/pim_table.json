@@ -1,0 +1,140 @@
+{
+ "energy": {
+  "act_pJ_bit": 0.11,
+  "cell_read_pJ_bit": 0.44,
+  "in_bank_pJ_bit": 0.55,
+  "mac_pJ": 0.32,
+  "mac_pJ_B": 0.16,
+  "pim_pJ_B": 4.5600000000000005,
+  "pim_pJ_bit": 0.5700000000000001
+ },
+ "model": {
+  "name": "LLaMA-65B",
+  "tp": 8,
+  "context": 2048,
+  "weights_B_per_gpu": 16250000000.0,
+  "kv_B_per_token": 327680.0
+ },
+ "gpus": {
+  "H100": {
+   "preset": "HBM3_5.2Gbps",
+   "data_rate_Gbps": 5.2,
+   "tCK_ns": 0.7692307692307693,
+   "stacks": 5,
+   "mac_interval_clk": 6,
+   "mac_interval_ns": 4.615384615384615,
+   "timing_limit_clk": 4,
+   "timing_limit_ns": 3.076923076923077,
+   "pim_bw_TBs_stack": 5.3819288198298185,
+   "pim_W_stack": 24.541595418423977,
+   "pim_bw_timing_TBs_stack": 7.401350089035869,
+   "pim_W_timing_stack": 33.75015640600357,
+   "pim_W_stack_step_avg": 23.06909969331854,
+   "pim_W_timing_stack_step_avg": 31.72514702164336,
+   "batch": 94,
+   "pairs_mean": 9.4,
+   "pairs_most_loaded": 10,
+   "kappa": 1.0638297872340425,
+   "trfc_ns": 350,
+   "r_gpu": 1.109375,
+   "r_pim": {
+    "4": 1.1103019109483383,
+    "6": 1.108767754318618
+   },
+   "r_pim_per_bank": {
+    "pbj": {
+     "4": 1.1530084040436848,
+     "6": 1.1569109982676966
+    },
+    "pbh": {
+     "4": 1.088372241697122,
+     "6": 1.0852475633528265
+    }
+   }
+  },
+  "H200": {
+   "preset": "HBM3_6.4Gbps",
+   "data_rate_Gbps": 6.4,
+   "tCK_ns": 0.625,
+   "stacks": 6,
+   "mac_interval_clk": 7,
+   "mac_interval_ns": 4.375,
+   "timing_limit_clk": 4,
+   "timing_limit_ns": 2.5,
+   "pim_bw_TBs_stack": 5.715701580207502,
+   "pim_W_stack": 26.063599205746215,
+   "pim_bw_timing_TBs_stack": 8.830068321551865,
+   "pim_W_timing_stack": 40.265111546276515,
+   "pim_W_stack_step_avg": 25.113363818036717,
+   "pim_W_timing_stack_step_avg": 38.79711268781852,
+   "batch": 185,
+   "pairs_mean": 15.416666666666666,
+   "pairs_most_loaded": 16,
+   "kappa": 1.037837837837838,
+   "trfc_ns": 410,
+   "r_gpu": 1.133116883116883,
+   "r_pim": {
+    "4": 1.1343571365969092,
+    "7": 1.1351304448429456
+   },
+   "r_pim_per_bank": {
+    "pbj": {
+     "4": 1.172963687550699,
+     "7": 1.1679591261009936
+    },
+    "pbh": {
+     "4": 1.0949551918271498,
+     "7": 1.095159026665876
+    }
+   }
+  },
+  "B200": {
+   "preset": "HBM3_8.0Gbps",
+   "data_rate_Gbps": 8.0,
+   "tCK_ns": 0.5,
+   "stacks": 8,
+   "mac_interval_clk": 9,
+   "mac_interval_ns": 4.5,
+   "timing_limit_clk": 5,
+   "timing_limit_ns": 2.5,
+   "pim_bw_TBs_stack": 5.445608662151749,
+   "pim_W_stack": 24.83197549941198,
+   "pim_bw_timing_TBs_stack": 8.904725729442971,
+   "pim_W_timing_stack": 40.605549326259954,
+   "pim_W_stack_step_avg": 23.66797664787704,
+   "pim_W_timing_stack_step_avg": 38.70216420159152,
+   "batch": 244,
+   "pairs_mean": 15.25,
+   "pairs_most_loaded": 16,
+   "kappa": 1.0491803278688525,
+   "trfc_ns": 410,
+   "r_gpu": 1.133116883116883,
+   "r_pim": {
+    "5": 1.1289522044387201,
+    "9": 1.1325262308313155
+   },
+   "r_pim_per_bank": {
+    "pbj": {
+     "5": 1.1655549564815528,
+     "9": 1.1691649351934303
+    },
+    "pbh": {
+     "5": 1.0949592152479082,
+     "9": 1.0929395448855461
+    }
+   }
+  }
+ },
+ "attacc_e2e_h100": {
+  "fc_us": 82.55749151944731,
+  "attn_gpu_us": 296.1721971079602,
+  "attn_pim_us": 31.004542000000004,
+  "attn_pim_model_us": 31.173240229755603,
+  "attn_pim_err_pct": 0.5441081173061635,
+  "step_gpu_ms": 40.71590515062601,
+  "step_pim_ms": 19.528161008655868,
+  "speedup": 2.0849840972008917,
+  "power_W_per_gpu": 83.24979445857704,
+  "dram_W_per_gpu": 57.74783731578296
+ }
+}

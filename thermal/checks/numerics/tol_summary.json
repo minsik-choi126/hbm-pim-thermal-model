@@ -1,0 +1,21 @@
+{
+ "run": "a50_par_k1_r0.01361_g64_gpu_tol*",
+ "source": "GPU die C_0, 1000 W",
+ "layers": 22,
+ "max_rise_K": 60.89000000000004,
+ "max_abs_diff_vs_1e10_K": {
+  "1e-06": 0.010000000000047748,
+  "1e-08": 0.010000000000047748
+ },
+ "iterations": {
+  "1e-06": 46108,
+  "1e-08": 67113,
+  "1e-10": 88119
+ },
+ "energy_balance_err_pct": {
+  "1e-06": 2.671888349412388,
+  "1e-08": 2.655411307476929,
+  "1e-10": 2.6553590899764723
+ },
+ "note": "HotSpot prints 0.01 K; a difference of 0.01 K is one output step"
+}

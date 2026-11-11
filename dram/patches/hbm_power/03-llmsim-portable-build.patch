@@ -1,0 +1,482 @@
+diff --git a/sources/LLMSimulator/CMakeLists.txt b/sources/LLMSimulator/CMakeLists.txt
+index ba4798c..177b5ee 100644
+--- a/sources/LLMSimulator/CMakeLists.txt
++++ b/sources/LLMSimulator/CMakeLists.txt
+@@ -2,6 +2,22 @@ CMAKE_MINIMUM_REQUIRED (VERSION 3.14)
+ 
+ PROJECT (llm_system)
+ 
++# Apple clang defaults to C++14 (g++ >= 11 defaults to gnu++17); the simulator
++# uses std::filesystem/std::optional and includes Ramulator2's C++20 headers.
++if(NOT CMAKE_CXX_STANDARD)
++    set(CMAKE_CXX_STANDARD 20)
++    set(CMAKE_CXX_STANDARD_REQUIRED ON)
++    set(CMAKE_CXX_EXTENSIONS OFF)
++endif()
++
++
++# spdlog 1.11.0 (fetched by Ramulator2) bundles fmt 9.1.0, whose consteval
++# FMT_STRING checker is rejected by recent Apple clang ("call to consteval
++# function ... is not a constant expression"). Every target that includes
++# Ramulator headers pulls spdlog in, so define it globally. Same runtime behaviour.
++if(APPLE)
++    add_compile_definitions(FMT_CONSTEVAL=)
++endif()
+ 
+ add_library(llm_system SHARED)
+ add_compile_options(-fPIC)
+@@ -13,10 +29,18 @@ add_subdirectory(src)
+ add_subdirectory(eval)
+ 
+ 
++# The dram archive must be linked whole (static-registration of Ramulator impls).
++# GNU ld: --whole-archive; Apple ld64/ld-prime: -force_load <archive>.
++if(APPLE)
++    set(DRAM_WHOLE_ARCHIVE -Wl,-force_load,$<TARGET_FILE:dram> dram)
++else()
++    set(DRAM_WHOLE_ARCHIVE -Wl,--whole-archive dram -Wl,--no-whole-archive)
++endif()
++
+ target_link_libraries(
+     llm_system
+     PRIVATE hardware
+-    PRIVATE -Wl,--whole-archive dram -Wl,--no-whole-archive 
++    PRIVATE ${DRAM_WHOLE_ARCHIVE}
+     #PRIVATE dram
+     PRIVATE module
+     PRIVATE model
+diff --git a/sources/LLMSimulator/src/dram/ramulator2/src/base/param.h b/sources/LLMSimulator/src/dram/ramulator2/src/base/param.h
+index c626ee4..70d623a 100644
+--- a/sources/LLMSimulator/src/dram/ramulator2/src/base/param.h
++++ b/sources/LLMSimulator/src/dram/ramulator2/src/base/param.h
+@@ -1,215 +1,215 @@
+-#ifndef     RAMULATOR_BASE_PARAM_H
+-#define     RAMULATOR_BASE_PARAM_H
+-
+-#include <vector>
+-#include <unordered_map>
+-#include <string>
+-#include <optional>
+-#include <type_traits>
+-
+-#include <spdlog/spdlog.h>
+-#include <yaml-cpp/yaml.h>
+-
+-#include "base/exception.h"
+-
+-
+-namespace Ramulator {
+-
+-class Implementation;
+-class Params;
+-template<typename T> class _ParamChainer;
+-
+-class _ParamGroupChainer {
+-  friend Params;
+-  private:
+-    YAML::Node _config;
+-    const std::string _impl_name;
+-
+-    Params& _params;
+-
+-    std::string _group_prefix = "";
+-
+-    _ParamGroupChainer(YAML::Node& config, std::string impl_name, Params& params) : _config(config), _impl_name(impl_name), _params(params) {};
+-    _ParamGroupChainer& _set_group(std::string group_name) {
+-      if (_config[group_name]) {
+-        _config.reset(_config[group_name]);
+-        _group_prefix += (group_name + "::");
+-      } else {
+-        throw ConfigurationError("ParamGroup \"{}\" is not specified for implementation \"{}\".", group_name, _impl_name);
+-      }
+-      return *this;
+-    };
+-
+-  public:
+-    template<typename T>
+-    _ParamChainer<T> param(std::string param_name);
+-    template<typename T>
+-    _ParamChainer<T> param(std::string_view param_name) { return param<T>(std::string(param_name)); };
+-    template<typename T>
+-    _ParamChainer<T> param(const char* param_name) { return param<T>(std::string(param_name)); };;
+-
+-    _ParamGroupChainer& group(std::string group_name) {
+-      if (group_name == "impl" || group_name == "id") {
+-        throw ConfigurationError("In implementation \"{}\": ParamGroup name \"{}\" is reserved!", _impl_name, group_name);
+-      }
+-
+-      _set_group(group_name);
+-      return *this;
+-    };
+-};
+-
+-
+-template<typename T>
+-class _ParamChainer {
+-  friend Params;
+-  friend _ParamGroupChainer;
+-  private:
+-    const YAML::Node& _config;
+-    const std::string _impl_name;
+-
+-    Params& _params;
+-
+-    std::string _name;
+-    std::string _name_prefix;
+-    std::string _desc;
+-
+-    T _default_val;
+-    bool _default_val_set = false;
+-    bool _required = false;
+-
+-
+-  private:
+-    _ParamChainer(const YAML::Node& config, std::string impl_name, Params& params) : _config(config), _impl_name(impl_name), _params(params) {};
+-    _ParamChainer& _set_name(std::string name) { _name = name; return *this; };
+-    std::optional<T> _get() const { 
+-      if (_default_val_set && _required) {
+-        throw ConfigurationError("Param \"{}\" for implementation \"{}\" cannot both has a default value and be required.", _name_prefix + _name, _impl_name);
+-      }
+-
+-      if (_config[_name]) {
+-        try {
+-          return _config[_name].as<T>();
+-        } catch (const YAML::BadConversion& e) {
+-          throw ConfigurationError("Failed to parse Param \"{}\" for implementation \"{}\".", _name_prefix + _name, _impl_name);
+-        }
+-      } else if (_required) {
+-        throw ConfigurationError("Param \"{}\" for implementation \"{}\" is required but not given.", _name_prefix + _name, _impl_name);
+-      } else if (_default_val_set) {
+-        return _default_val;
+-      } else {
+-        // throw ConfigurationError("No default value given for unspecified Param \"{}\" for implementation \"{}\" .", _name_prefix + _name, _impl_name);
+-        return std::nullopt;
+-      }
+-    };
+-
+-  public:
+-    operator T() const { return *_get(); }
+-
+-    _ParamChainer& desc(std::string desc);
+-    _ParamChainer& required() { _required = true; return *this; };
+-    _ParamChainer& default_val(T default_val) { _default_val = default_val; _default_val_set = true; return *this; };
+-    std::optional<T> optional() { return _get(); };
+-};
+-
+-
+-class Params {
+-  template <typename> friend class _ParamChainer;
+-  friend _ParamGroupChainer;
+-  friend Implementation;
+-  
+-  private:
+-    struct ParamInfo {
+-      std::string name;
+-      std::string desc;
+-    };
+-
+-    Registry_t<ParamInfo> m_registry;
+-
+-    std::string m_impl_name;
+-    YAML::Node m_config;
+-
+-  public:
+-    Params() {};
+-    Params(const YAML::Node& config) : m_config(config) {};
+-    void set_impl_name(std::string impl_name) { m_impl_name = impl_name; };
+-
+-  private:    
+-    template <typename T>
+-    _ParamChainer<T> _param(std::string param_name) {
+-      // Check for reserved key names
+-      if (param_name == "impl" || param_name == "id") {
+-        throw ConfigurationError("In implementation \"{}\": Param name \"{}\" is reserved!", m_impl_name, param_name);
+-      }
+-
+-      _add_name(param_name);
+-
+-      _ParamChainer<T> _p(m_config, m_impl_name, *this);
+-      _p._set_name(param_name);
+-      return _p;
+-    }
+-
+-    _ParamGroupChainer _group(std::string group_name) {
+-      if (group_name == "impl" || group_name == "id") {
+-        throw ConfigurationError("In implementation \"{}\": ParamGroup name \"{}\" is reserved!", m_impl_name, group_name);
+-      }
+-
+-      _ParamGroupChainer _pg(m_config, m_impl_name, *this);
+-      _pg._set_group(group_name);
+-      return _pg;
+-    }
+-
+-    void _add_name(std::string param_name) {
+-      // Check for existing params
+-      if (auto it = m_registry.find(param_name); it != m_registry.end()) {
+-        throw InitializationError(
+-          "In implementation {}, param name \"{}\" is already registered.",
+-          m_impl_name,
+-          param_name
+-        );
+-      } else {
+-        m_registry[param_name] = {param_name};
+-      }
+-    }
+-
+-    void _add_desc(std::string param_name, std::string param_desc) {
+-      // Check for existing params
+-      if (auto it = m_registry.find(param_name); it != m_registry.end()) {
+-        auto [name, info] = *it;
+-        info.desc = param_desc;
+-      } else {
+-        throw InitializationError(
+-          "In implementation {}, param name \"{}\" is not yet registered but a description is being added to it.",
+-          m_impl_name,
+-          param_name
+-        );
+-      }
+-    }
+-};
+-
+-template<typename T>
+-_ParamChainer<T> _ParamGroupChainer::param(std::string param_name)  {
+-  std::string prefixed_param_name = _group_prefix + param_name;
+-
+-  // Check for reserved key names
+-  if (param_name == "impl" || param_name == "id") {
+-    throw ConfigurationError("In implementation \"{}\": Param name \"{}\" is reserved!", _impl_name, prefixed_param_name);
+-  }
+-
+-  _params._add_name(prefixed_param_name);
+-
+-  _ParamChainer<T> _p(_config, _impl_name, _params);
+-  _p._set_name(param_name);
+-  _p._name_prefix = _group_prefix;
+-  return _p;
+-}
+-
+-template<typename T>
+-_ParamChainer<T>& _ParamChainer<T>::desc(std::string desc) {
+-  _desc = desc;
+-  _params._add_desc(_name_prefix + _name, desc);
+-  return *this; 
+-};
+-
+-}        // namespace Ramulator
+-
++#ifndef     RAMULATOR_BASE_PARAM_H
++#define     RAMULATOR_BASE_PARAM_H
++
++#include <vector>
++#include <unordered_map>
++#include <string>
++#include <optional>
++#include <type_traits>
++
++#include <spdlog/spdlog.h>
++#include <yaml-cpp/yaml.h>
++
++#include "base/exception.h"
++
++
++namespace Ramulator {
++
++class Implementation;
++class Params;
++template<typename T> class _ParamChainer;
++
++class _ParamGroupChainer {
++  friend Params;
++  private:
++    YAML::Node _config;
++    const std::string _impl_name;
++
++    Params& _params;
++
++    std::string _group_prefix = "";
++
++    _ParamGroupChainer(YAML::Node& config, std::string impl_name, Params& params) : _config(config), _impl_name(impl_name), _params(params) {};
++    _ParamGroupChainer& _set_group(std::string group_name) {
++      if (_config[group_name]) {
++        _config.reset(_config[group_name]);
++        _group_prefix += (group_name + "::");
++      } else {
++        throw ConfigurationError("ParamGroup \"{}\" is not specified for implementation \"{}\".", group_name, _impl_name);
++      }
++      return *this;
++    };
++
++  public:
++    template<typename T>
++    _ParamChainer<T> param(std::string param_name);
++    template<typename T>
++    _ParamChainer<T> param(std::string_view param_name) { return param<T>(std::string(param_name)); };
++    template<typename T>
++    _ParamChainer<T> param(const char* param_name) { return param<T>(std::string(param_name)); };;
++
++    _ParamGroupChainer& group(std::string group_name) {
++      if (group_name == "impl" || group_name == "id") {
++        throw ConfigurationError("In implementation \"{}\": ParamGroup name \"{}\" is reserved!", _impl_name, group_name);
++      }
++
++      _set_group(group_name);
++      return *this;
++    };
++};
++
++
++template<typename T>
++class _ParamChainer {
++  friend Params;
++  friend _ParamGroupChainer;
++  private:
++    const YAML::Node& _config;
++    const std::string _impl_name;
++
++    Params& _params;
++
++    std::string _name;
++    std::string _name_prefix;
++    std::string _desc;
++
++    T _default_val;
++    bool _default_val_set = false;
++    bool _required = false;
++
++
++  private:
++    _ParamChainer(const YAML::Node& config, std::string impl_name, Params& params) : _config(config), _impl_name(impl_name), _params(params) {};
++    _ParamChainer& _set_name(std::string name) { _name = name; return *this; };
++    std::optional<T> _get() const { 
++      if (_default_val_set && _required) {
++        throw ConfigurationError("Param \"{}\" for implementation \"{}\" cannot both has a default value and be required.", _name_prefix + _name, _impl_name);
++      }
++
++      if (_config[_name]) {
++        try {
++          return _config[_name].template as<T>();
++        } catch (const YAML::BadConversion& e) {
++          throw ConfigurationError("Failed to parse Param \"{}\" for implementation \"{}\".", _name_prefix + _name, _impl_name);
++        }
++      } else if (_required) {
++        throw ConfigurationError("Param \"{}\" for implementation \"{}\" is required but not given.", _name_prefix + _name, _impl_name);
++      } else if (_default_val_set) {
++        return _default_val;
++      } else {
++        // throw ConfigurationError("No default value given for unspecified Param \"{}\" for implementation \"{}\" .", _name_prefix + _name, _impl_name);
++        return std::nullopt;
++      }
++    };
++
++  public:
++    operator T() const { return *_get(); }
++
++    _ParamChainer& desc(std::string desc);
++    _ParamChainer& required() { _required = true; return *this; };
++    _ParamChainer& default_val(T default_val) { _default_val = default_val; _default_val_set = true; return *this; };
++    std::optional<T> optional() { return _get(); };
++};
++
++
++class Params {
++  template <typename> friend class _ParamChainer;
++  friend _ParamGroupChainer;
++  friend Implementation;
++  
++  private:
++    struct ParamInfo {
++      std::string name;
++      std::string desc;
++    };
++
++    Registry_t<ParamInfo> m_registry;
++
++    std::string m_impl_name;
++    YAML::Node m_config;
++
++  public:
++    Params() {};
++    Params(const YAML::Node& config) : m_config(config) {};
++    void set_impl_name(std::string impl_name) { m_impl_name = impl_name; };
++
++  private:    
++    template <typename T>
++    _ParamChainer<T> _param(std::string param_name) {
++      // Check for reserved key names
++      if (param_name == "impl" || param_name == "id") {
++        throw ConfigurationError("In implementation \"{}\": Param name \"{}\" is reserved!", m_impl_name, param_name);
++      }
++
++      _add_name(param_name);
++
++      _ParamChainer<T> _p(m_config, m_impl_name, *this);
++      _p._set_name(param_name);
++      return _p;
++    }
++
++    _ParamGroupChainer _group(std::string group_name) {
++      if (group_name == "impl" || group_name == "id") {
++        throw ConfigurationError("In implementation \"{}\": ParamGroup name \"{}\" is reserved!", m_impl_name, group_name);
++      }
++
++      _ParamGroupChainer _pg(m_config, m_impl_name, *this);
++      _pg._set_group(group_name);
++      return _pg;
++    }
++
++    void _add_name(std::string param_name) {
++      // Check for existing params
++      if (auto it = m_registry.find(param_name); it != m_registry.end()) {
++        throw InitializationError(
++          "In implementation {}, param name \"{}\" is already registered.",
++          m_impl_name,
++          param_name
++        );
++      } else {
++        m_registry[param_name] = {param_name};
++      }
++    }
++
++    void _add_desc(std::string param_name, std::string param_desc) {
++      // Check for existing params
++      if (auto it = m_registry.find(param_name); it != m_registry.end()) {
++        auto [name, info] = *it;
++        info.desc = param_desc;
++      } else {
++        throw InitializationError(
++          "In implementation {}, param name \"{}\" is not yet registered but a description is being added to it.",
++          m_impl_name,
++          param_name
++        );
++      }
++    }
++};
++
++template<typename T>
++_ParamChainer<T> _ParamGroupChainer::param(std::string param_name)  {
++  std::string prefixed_param_name = _group_prefix + param_name;
++
++  // Check for reserved key names
++  if (param_name == "impl" || param_name == "id") {
++    throw ConfigurationError("In implementation \"{}\": Param name \"{}\" is reserved!", _impl_name, prefixed_param_name);
++  }
++
++  _params._add_name(prefixed_param_name);
++
++  _ParamChainer<T> _p(_config, _impl_name, _params);
++  _p._set_name(param_name);
++  _p._name_prefix = _group_prefix;
++  return _p;
++}
++
++template<typename T>
++_ParamChainer<T>& _ParamChainer<T>::desc(std::string desc) {
++  _desc = desc;
++  _params._add_desc(_name_prefix + _name, desc);
++  return *this; 
++};
++
++}        // namespace Ramulator
++
+ #endif   // RAMULATOR_BASE_PARAM_H
+\ No newline at end of file

@@ -1,0 +1,183 @@
+{
+ "note": "GPU-side calibration inputs behind data/inputs/beta_operating_point.json and ripple_phases.json. They come from the analysis repository (decode-step and power model fitted to H100 measurements) at commit cc8fdf6, file pipeline/e2e_joint/<file>; this repository does not recompute them. 'commit' is the last commit that changed the file. The H100 slopes are listed as a cross-check: steps/measured.py recomputes them from data/measured.",
+ "inputs": [
+  {
+   "name": "a_G",
+   "value": 0.0225906,
+   "unit": "K/W",
+   "file": "paths_multi.json",
+   "key": "H100.s_host",
+   "commit": "8f34163",
+   "what": "HBM rise per non-memory W, 89 settled H100 rows",
+   "used_for": "cross-check only: steps/measured.py recomputes it (out/measured.json)"
+  },
+  {
+   "name": "a_M",
+   "value": 0.18774,
+   "unit": "K/W",
+   "file": "paths_multi.json",
+   "key": "H100.s_rail",
+   "commit": "8f34163",
+   "what": "HBM rise per memory W",
+   "used_for": "cross-check only: steps/measured.py recomputes it"
+  },
+  {
+   "name": "gpu_die_per_nonmem_W",
+   "value": 0.0654937,
+   "unit": "K/W",
+   "file": "paths_multi.json",
+   "key": "H100.gpu_s_host",
+   "commit": "8f34163",
+   "what": "GPU-die rise per non-memory W",
+   "used_for": "cross-check only: recomputed here (recal checks_measured)"
+  },
+  {
+   "name": "idle_W",
+   "value": [
+    80.3857,
+    39.0103
+   ],
+   "unit": "W",
+   "file": "abs_threshold.json",
+   "key": "setup.idle_W.H100",
+   "commit": "35c9560",
+   "what": "[GPU, memory] idle power of the decode model",
+   "used_for": "beta_operating_point.json; ripple_phases.json on phase and off-phase memory heat"
+  },
+  {
+   "name": "mu_K",
+   "value": 67.9356,
+   "unit": "pJ/B",
+   "file": "decode_calib.json",
+   "key": "pJ_per_B.mem_kv",
+   "commit": "8f34163",
+   "what": "measured memory energy per KV byte read in H100 decoding",
+   "used_for": "in-bank energy = s x mu_K (operating point, ripple_phases.json)"
+  },
+  {
+   "name": "s",
+   "value": 0.2635,
+   "unit": "-",
+   "file": "abs_threshold.json",
+   "key": "setup.hbmpim_ratio",
+   "commit": "35c9560",
+   "what": "in-bank share of the read energy (HBM-PIM Sec. VII-C)",
+   "used_for": "ripple_phases.json s"
+  },
+  {
+   "name": "MAC",
+   "value": 0.16,
+   "unit": "pJ/B",
+   "file": "abs_threshold.json",
+   "key": "setup.MAC_pJ_B",
+   "commit": "35c9560",
+   "what": "MAC energy per byte (AttAcc table value, charged on K and V)",
+   "used_for": "P_P and ek"
+  },
+  {
+   "name": "E_BA",
+   "value": 4.56,
+   "unit": "pJ/B",
+   "file": "abs_threshold.json",
+   "key": "setup.E_BA_pJ_B",
+   "commit": "35c9560",
+   "what": "AttAcc table PIM energy per byte",
+   "used_for": "ek = PIM energy / E_BA"
+  },
+  {
+   "name": "rail_heat",
+   "value": 0.831839,
+   "unit": "-",
+   "file": "decode_kit_calib.json",
+   "key": "rail_heat.H100",
+   "commit": "c4639b0",
+   "what": "share of memory-rail dynamic power that heats the HBM, fitted on 5 H100 decode runs",
+   "used_for": "ripple_phases.json off-phase memory heat"
+  },
+  {
+   "name": "bw_timing",
+   "value": 7.40135,
+   "unit": "TB/s per stack",
+   "file": "abs_threshold.json",
+   "key": "setup.bw_timing_TBs_stack.H100",
+   "commit": "35c9560",
+   "what": "PIM bandwidth at tCCD_L from the AttAcc simulator (dram/ of this repository)",
+   "used_for": "PIM-on time (operating point, ripple)"
+  },
+  {
+   "name": "busy_factor",
+   "value": 0.94,
+   "unit": "-",
+   "file": "abs_threshold.json",
+   "key": "setup.busy_factor.H100",
+   "commit": "35c9560",
+   "what": "share of time not blocked by refresh",
+   "used_for": "PIM-on time"
+  },
+  {
+   "name": "tdp",
+   "value": 700,
+   "unit": "W",
+   "file": "abs_threshold.json",
+   "key": "setup.tdp_W.H100",
+   "commit": "35c9560",
+   "what": "board power limit",
+   "used_for": "operating point (timing mode: no power constraint)"
+  },
+  {
+   "name": "idle_premium",
+   "value": {
+    "gpu_side_W": 41.9701,
+    "memory_W": 2.59174,
+    "board_W": 44.5619
+   },
+   "unit": "W",
+   "file": "idle_premium.json",
+   "key": "premium.H100",
+   "commit": "c4639b0",
+   "what": "power above bare idle while a decode process is resident",
+   "used_for": "decode-model idle powers"
+  },
+  {
+   "name": "fc_calib",
+   "value": {
+    "e_scale": 1.22661,
+    "alpha": 3.30082,
+    "roof_k": 2.65044
+   },
+   "unit": "-",
+   "file": "fc_calib.json",
+   "key": "e_scale, alpha, roof_k",
+   "commit": "8f34163",
+   "what": "FC-layer clock and power fit, 52 measured rows",
+   "used_for": "GPU step time and power of the decode model"
+  },
+  {
+   "name": "ripple_phases",
+   "value": {
+    "s": 0.264,
+    "ek": 3.9682,
+    "step_ms": 17.9727,
+    "pim_on_ms": 1.7046,
+    "layers": 80,
+    "pim_W_per_stack_on": 133.9274
+   },
+   "unit": "-",
+   "file": "thermal_bank_pim.json",
+   "key": "ripple.phases",
+   "commit": "35c9560",
+   "what": "decode-step phases of the ripple study",
+   "used_for": "ripple_phases.json (same values)"
+  },
+  {
+   "name": "e_x_H100",
+   "value": 1.83551,
+   "unit": "pJ/bit",
+   "file": "abs_threshold.json",
+   "key": "thresholds.H100.timing.e_x_pJ_bit",
+   "commit": "35c9560",
+   "what": "in-bank energy of the operating point (the H100 threshold computed with beta 1.11)",
+   "used_for": "beta_operating_point.json e_pJ_bit"
+  }
+ ]
+}

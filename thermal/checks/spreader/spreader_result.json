@@ -1,0 +1,22 @@
+{
+ "s45.6mm": {
+  "uni_peak_per_W_stack": 0.9419,
+  "array_peak_per_W_stack": 1.0718,
+  "array_over_uni": 1.1379127295891285,
+  "gpu_peak_dram_per_W": 0.03531,
+  "uni_left_stack_outer_vs_gpu_edge": [
+   0.9418500000000001,
+   0.6205000000000002
+  ]
+ },
+ "s70mm": {
+  "uni_peak_per_W_stack": 0.9488,
+  "array_peak_per_W_stack": 1.0682999999999998,
+  "array_over_uni": 1.1259485666104552,
+  "gpu_peak_dram_per_W": 0.034870000000000005,
+  "uni_left_stack_outer_vs_gpu_edge": [
+   0.9487000000000001,
+   0.6241500000000002
+  ]
+ }
+}
