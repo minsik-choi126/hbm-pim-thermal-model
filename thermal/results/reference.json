@@ -263,7 +263,7 @@
   {
    "id": "bank.ripple.summary.per_layer_max_above_avg",
    "what": "ripple, per-layer PIM bursts (K above step average)",
-   "paper": "0.06 (<= 0.1)",
+   "paper": "bound 0.1",
    "full": 0.0549,
    "quick": 0.05501934732291147,
    "tol": {
@@ -274,7 +274,7 @@
   {
    "id": "bank.ripple.summary.per_layer_plus_burst_max",
    "what": "  plus adiabatic swing within a burst (K)",
-   "paper": "0.14",
+   "paper": "",
    "full": 0.1356,
    "quick": 0.13569311580294738,
    "tol": {
@@ -285,7 +285,7 @@
   {
    "id": "bank.ripple.summary.lump_max_above_avg",
    "what": "ripple, all PIM time in one block (K)",
-   "paper": "3.7",
+   "paper": "",
    "full": 3.661,
    "quick": 3.6610423074926217,
    "tol": {
@@ -296,7 +296,7 @@
   {
    "id": "bank.ripple.pim_on_per_layer_us",
    "what": "PIM on time per layer (us)",
-   "paper": "21.3",
+   "paper": "",
    "full": 21.307499999999997,
    "quick": 21.307499999999997,
    "tol": {
@@ -416,7 +416,7 @@
   {
    "id": "beta.summary.thresholds_e_x_at_1p11.H100",
    "what": "H100 threshold at beta 1.11 from the exported operating points (pJ/bit)",
-   "paper": "1.84",
+   "paper": "",
    "full": 1.83551,
    "quick": 1.83551,
    "tol": {
@@ -561,7 +561,7 @@
   {
    "id": "recal.summary.best.x",
    "what": "x matching the measured ratio",
-   "paper": "98 %",
+   "paper": "",
    "full": 0.97511,
    "quick": 0.97511,
    "tol": {
@@ -572,7 +572,7 @@
   {
    "id": "recal.summary.best.k",
    "what": "  bond-layer k there (W/m-K)",
-   "paper": "1.9",
+   "paper": "",
    "full": 1.92697,
    "quick": 1.92697,
    "tol": {
@@ -583,7 +583,7 @@
   {
    "id": "recal.summary.best.r",
    "what": "  r_convec there (K/W)",
-   "paper": "0.0103",
+   "paper": "",
    "full": 0.01031,
    "quick": 0.01031,
    "tol": {
@@ -672,7 +672,7 @@
   {
    "id": "recal.summary.best.base_over_dram",
    "what": "  base-die W over DRAM-die W",
-   "paper": "1.6",
+   "paper": "",
    "full": 1.62904,
    "quick": 1.62904,
    "tol": {
@@ -683,7 +683,7 @@
   {
    "id": "recal.summary.best.beta_half[0]",
    "what": "  beta, half of the channels, low",
-   "paper": "0.93",
+   "paper": "",
    "full": 0.93468,
    "tol": {
     "full": 2e-05,
@@ -704,7 +704,7 @@
   {
    "id": "recal.summary.best.beta_half[1]",
    "what": "  beta, half of the channels, high",
-   "paper": "1.14",
+   "paper": "",
    "full": 1.14489,
    "tol": {
     "full": 2e-05,
@@ -725,7 +725,7 @@
   {
    "id": "recal.summary.best.beta_quarter[0]",
    "what": "  beta, quarter of the channels, low",
-   "paper": "1.07",
+   "paper": "",
    "full": 1.07473,
    "tol": {
     "full": 2e-05,
@@ -746,7 +746,7 @@
   {
    "id": "recal.summary.best.beta_quarter[1]",
    "what": "  beta, quarter of the channels, high",
-   "paper": "1.86",
+   "paper": "",
    "full": 1.85861,
    "tol": {
     "full": 2e-05,
@@ -767,7 +767,7 @@
   {
    "id": "recal.summary.allowed.x[0]",
    "what": "smallest x with ratio inside the CI",
-   "paper": "74 %",
+   "paper": "",
    "full": 0.73766,
    "quick": 0.73766,
    "tol": {
@@ -932,7 +932,7 @@
   {
    "id": "recal.summary.basephy_target.x",
    "what": "x matching the ratio, base-die W on the GPU side",
-   "paper": "36 %",
+   "paper": "",
    "full": 0.35709,
    "quick": 0.35709,
    "tol": {

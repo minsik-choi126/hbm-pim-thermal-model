@@ -52,7 +52,7 @@ against 0.01102), the operating point and the normaliser.
 
 ## Values
 
-paper: as printed. quick: computed here (`out/`, mode quick). full: the values behind the paper, from the analysis
+paper: as printed in the current manuscript (blank = not printed). quick: computed here (`out/`, mode quick). full: the values behind the paper, from the analysis
 repository; `results/reference.json` holds them with tolerances (96 values; 87 apply in quick mode). The grid-128 bank model was
 run here from cached runs (`python3 -m thermal.steps.bank --grids 64,128`): f_bank 1.1145 against 1.1146.
 
@@ -66,12 +66,12 @@ run here from cached runs (`python3 -m thermal.steps.bank --grids 64,128`): f_ba
 | beta, half / quarter of the channels, x = 0 | 1.51-1.80 / 1.75-2.86 | 1.508-1.802 / 1.751-2.858 | = quick | `out/beta.json` |
 | H100 threshold where beta is evaluated (pJ/bit), x = 0 / matched x | | 1.872 / 3.038 | = quick | `out/beta.json`, `out/recal.json` |
 | base-die W over DRAM-die W (peak DRAM rise) | 1.7 | 1.742 | 1.742 | `out/bank.json` |
-| ripple, per-layer PIM bursts (K) | 0.06, bound 0.1 | 0.0550 | 0.0549 | `out/bank.json` |
+| ripple, per-layer PIM bursts (K) | bound 0.1 | 0.0550 | 0.0549 | `out/bank.json` |
 | beta at base-die share x = 0 (family) / x = 1 | 1.09 / 0.67 | 1.088 / 0.668 | = quick | `out/recal.json` |
-| x matching the row-miss ratio, beta there | 98 %, 0.67 | 0.975, 0.674 | = quick | `out/recal.json` |
-| same, half / quarter of the channels | 0.93-1.14 / 1.07-1.86 | | 0.935-1.145 / 1.075-1.859 | `out/recal.json` (full) |
+| x matching the row-miss ratio, beta there | beta 0.67 | 0.975, 0.674 | = quick | `out/recal.json` |
+| same, half / quarter of the channels | | | 0.935-1.145 / 1.075-1.859 | `out/recal.json` (full) |
 | beta for x with ratio inside the CI | 0.67-0.74 | 0.668-0.736 | = quick | `out/recal.json` |
-| same, base-die power on the GPU side: x, beta | 36 %, 0.67 | 0.357, 0.669 | = quick | `out/recal.json` |
+| same, base-die power on the GPU side: x, beta | beta 0.67 | 0.357, 0.669 | = quick | `out/recal.json` |
 | die-average sensor (bottom die / base die): x, beta | 69 % / 52 %, 0.75 / 0.81 | 0.686 / 0.517, 0.748 / 0.807 | = quick | `out/recal.json` |
 | reference only, not in the paper: x from our HBM3E I/O-and-TSV lower bound, beta | | 0.165, 0.982 | = quick | `out/recal.json` |
 
