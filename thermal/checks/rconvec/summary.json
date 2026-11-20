@@ -1,0 +1,19 @@
+{
+ "note": "Heat-sink resistance r_convec: sweep and package-size refits (2026-11-19/20). Measured H100 fit (89 points): HBM rise per W of non-memory power a_G 0.0226 K/W, per W of memory power a_M 0.1877 K/W, GPU rise per non-memory W 0.0655 K/W; highest-power point 698 W board (591 W non-memory, 107 W memory), HBM 63 C, GPU 66 C. Grid 64, floorplan a50_par. Sweep: out_abd.json (A, B, bound) and out_d.json (beta against r and x). Refits: verify/sol.json (k, r) with the beta and threshold below, each checked by direct HotSpot runs at the fitted (k, r) (a_G and a_M within 0.22 %). out_c.json holds an earlier refit whose r was extrapolated below its r grid; it is superseded by verify/.",
+ "sweep_k0.954_x0": [
+  {"r_convec": 0.01102, "a_G": 0.0225, "a_M": 0.1873, "gpu_slope": 0.0568, "beta": 1.0884, "hbm_at_698W_C": 63.2, "gpu_at_698W_C": 61.1},
+  {"r_convec": 0.02883, "a_G": 0.0438, "a_M": 0.2060, "gpu_slope": 0.0807, "beta": 1.0749, "hbm_at_698W_C": 77.8, "gpu_at_698W_C": 77.4},
+  {"r_convec": 0.05, "a_G": 0.0667, "a_M": 0.2281, "gpu_slope": 0.1047, "beta": 1.0652, "hbm_at_698W_C": 93.7, "gpu_at_698W_C": 94.0},
+  {"r_convec": 0.1, "a_G": 0.1191, "a_M": 0.2799, "gpu_slope": 0.1579, "beta": 1.0513, "hbm_at_698W_C": 130.2, "gpu_at_698W_C": 131.0},
+  {"r_convec": 0.143, "a_G": 0.1636, "a_M": 0.3243, "gpu_slope": 0.2027, "beta": 1.0439, "hbm_at_698W_C": 161.3, "gpu_at_698W_C": 162.3},
+  {"r_convec": 0.2, "a_G": 0.2224, "a_M": 0.3831, "gpu_slope": 0.2617, "beta": 1.0367, "hbm_at_698W_C": 202.3, "gpu_at_698W_C": 203.5}
+ ],
+ "fixed_r_lowest_a_G_over_k0.3-4_x0-1": {"r0.1": [0.1150, "5.1 x measured"], "r0.143": [0.1599, "7.1 x measured"]},
+ "package_refit_x0": [
+  {"spreader_mm": 45.6, "sink_mm": 82.1, "t_spreader_mm": 1, "k": 0.9537, "r_convec": 0.0110, "beta": 1.0884, "threshold_H100_pJ_bit": 1.872, "gpu_slope_err": -0.133},
+  {"spreader_mm": 60, "sink_mm": 120, "t_spreader_mm": 1, "k": 0.9465, "r_convec": 0.0059, "beta": 1.0852, "threshold_H100_pJ_bit": 1.878, "gpu_slope_err": -0.117},
+  {"spreader_mm": 80, "sink_mm": 150, "t_spreader_mm": 1, "k": 0.9512, "r_convec": 0.0038, "beta": 1.0856, "threshold_H100_pJ_bit": 1.877, "gpu_slope_err": -0.115},
+  {"spreader_mm": 60, "sink_mm": 120, "t_spreader_mm": 3, "k": 0.9549, "r_convec": 0.0058, "beta": 1.0871, "threshold_H100_pJ_bit": 1.875, "gpu_slope_err": -0.139}
+ ],
+ "beta_vs_r_k0.954": {"x0": [1.0884, 1.0439], "x0.5": [0.789, 0.862], "x0.975": [0.625, 0.737], "r": [0.011, 0.143]}
+}

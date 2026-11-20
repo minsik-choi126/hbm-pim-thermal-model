@@ -36,3 +36,4 @@ relative effects quoted in PARAMETERS.md. The model's beta (one definition, `mod
 | `variants/gpu_die.json` | GPU-die slope of the model against the measurement (-13 to -15 %) along the fit family | `variants/gpu_die.py` (same origin) | M04, P01 |
 | `geometry/bank128_result.json` | 64 two-bank cells against 128 one-bank cells per die: f_bank 1.118 -> 1.090 / 1.107 | `geometry/bank128.py` | F01 |
 | `skeptic/op_result.json` | the operating point rerun from the analysis model and beta at 1.84 / 2.5 / 3.1 pJ/bit | `skeptic/check_op.py` | P10 |
+| `rconvec/summary.json` (see `rconvec/README.md`) | r_convec 0.011-0.2 against the measured slopes and temperatures; larger spreader/sink refits: r 0.004-0.006, beta 1.085-1.087 | `rconvec/` scripts | M07, G09, G10 |
